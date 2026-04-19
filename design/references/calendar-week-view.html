@@ -1,1 +1,390 @@
+<!DOCTYPE html>
 
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Luminous Canvas | Antonio Larento</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#a8364b",
+                        "secondary-container": "#e3e2e7",
+                        "on-tertiary-fixed": "#31434f",
+                        "on-secondary-fixed": "#3e3f43",
+                        "tertiary-fixed": "#d4e8f7",
+                        "on-primary-fixed-variant": "#200032",
+                        "surface-bright": "#f9f9fe",
+                        "primary": "#9127c4",
+                        "surface-container-high": "#e5e8f0",
+                        "on-secondary": "#f9f8fe",
+                        "surface-container-low": "#f2f3fa",
+                        "tertiary-container": "#d4e8f7",
+                        "on-surface-variant": "#5b5f67",
+                        "inverse-surface": "#0c0e12",
+                        "surface-variant": "#dfe2ec",
+                        "on-error-container": "#6e0523",
+                        "background": "#f9f9fe",
+                        "on-secondary-fixed-variant": "#5b5b60",
+                        "on-tertiary": "#f4f9ff",
+                        "secondary-fixed-dim": "#d5d4d9",
+                        "on-tertiary-fixed-variant": "#4d606c",
+                        "outline-variant": "#aeb2bb",
+                        "error-dim": "#6b0221",
+                        "primary-fixed-dim": "#b14ce4",
+                        "tertiary-dim": "#435562",
+                        "surface-container": "#eceef5",
+                        "primary-fixed": "#bf5af2",
+                        "secondary-fixed": "#e3e2e7",
+                        "tertiary-fixed-dim": "#c6dae9",
+                        "surface-tint": "#9127c4",
+                        "primary-dim": "#8311b7",
+                        "inverse-primary": "#c863fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#2e333a",
+                        "surface-container-highest": "#dfe2ec",
+                        "primary-container": "#bf5af2",
+                        "on-error": "#fff7f7",
+                        "outline": "#777b83",
+                        "tertiary": "#4f626e",
+                        "inverse-on-surface": "#9c9da1",
+                        "error-container": "#f97386",
+                        "on-background": "#2e333a",
+                        "surface-dim": "#d6dae3",
+                        "on-secondary-container": "#515156",
+                        "secondary-dim": "#525357",
+                        "on-primary-container": "#000000",
+                        "on-primary-fixed": "#000000",
+                        "on-primary": "#fff7fc",
+                        "secondary": "#5e5f63",
+                        "surface": "#f9f9fe",
+                        "on-tertiary-container": "#435662"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); }
+        .dashed-grid { background-image: linear-gradient(to bottom, #aeb2bb26 1px, transparent 1px); background-size: 100% 80px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen overflow-hidden">
+<!-- Sidebar: SideNavBar -->
+<aside class="h-screen w-72 flex-col fixed left-0 top-0 bg-[#FAFAFA] flex flex-col py-8 px-6 z-50">
+<!-- User Card -->
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<img alt="Antonio Larento" class="w-10 h-10 rounded-full" data-alt="professional portrait of a product designer named Antonio Larento with a soft focused office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRS3sMKHFChOz17GV54pPpOkSj_paDE45mxIMKHWiUoKBL7dM7viwai5eEV7MEGUp56C8FvupuVtJdIQXwYkMQ0LUiOC6gTmPvOv24AUaneWQ30iC7OUdythSqG3gkBtmSwCxbW0kknZl6vOW1dEhcR4THWVVUfFlwuYZ2Sr6KF_kzqdOiosZ1mVZsOISsRBTi9GydwY9WZ4ZT9V1axfAv62WH5hvZ-2g1kE31IuIEI5JEai4JjRvb3ee43nqKSKYiz82LZo7DNb6H"/>
+<div>
+<p class="text-[14px] font-bold text-on-surface leading-tight">Antonio Larento</p>
+<p class="text-[11px] text-on-surface-variant">Product Designer</p>
+</div>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">notifications</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-[#FADCE5] text-[#a8364b] text-[9px] font-bold flex items-center justify-center rounded-full">6</span>
+</div>
+</div>
+<!-- Action -->
+<button class="mb-8 w-full py-3 bg-primary-container text-on-primary-container font-semibold rounded-full flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+<span class="material-symbols-outlined">add</span>
+            New Event
+        </button>
+<!-- Mini Calendar (July 2022) -->
+<div class="mb-8">
+<div class="flex items-center justify-between px-2 mb-4">
+<span class="font-bold text-sm">July 2022</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-sm cursor-pointer">chevron_left</span>
+<span class="material-symbols-outlined text-sm cursor-pointer">chevron_right</span>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-y-2 text-center">
+<!-- Day Labels -->
+<span class="text-[10px] font-bold text-outline">S</span>
+<span class="text-[10px] font-bold text-outline">M</span>
+<span class="text-[10px] font-bold text-outline">T</span>
+<span class="text-[10px] font-bold text-outline">W</span>
+<span class="text-[10px] font-bold text-outline">T</span>
+<span class="text-[10px] font-bold text-outline">F</span>
+<span class="text-[10px] font-bold text-outline">S</span>
+<!-- Calendar Dates -->
+<span class="text-[11px] text-outline opacity-40">26</span>
+<span class="text-[11px] text-outline opacity-40">27</span>
+<span class="text-[11px] text-outline opacity-40">28</span>
+<span class="text-[11px] text-outline opacity-40">29</span>
+<span class="text-[11px] text-outline opacity-40">30</span>
+<span class="text-[11px]">1</span>
+<span class="text-[11px]">2</span>
+<!-- ... skip to 12 -->
+<span class="text-[11px]">3</span><span class="text-[11px]">4</span><span class="text-[11px]">5</span><span class="text-[11px]">6</span><span class="text-[11px]">7</span><span class="text-[11px]">8</span><span class="text-[11px]">9</span>
+<span class="text-[11px]">10</span><span class="text-[11px]">11</span>
+<span class="text-[11px] w-6 h-6 flex items-center justify-center mx-auto bg-primary text-on-primary rounded-full font-bold">12</span>
+<span class="text-[11px]">13</span><span class="text-[11px]">14</span><span class="text-[11px]">15</span><span class="text-[11px]">16</span>
+</div>
+</div>
+<!-- Featured Card -->
+<div class="bg-surface-container-lowest rounded-[2rem] p-5 mb-8 shadow-sm">
+<div class="flex items-start justify-between mb-2">
+<h3 class="text-xs font-bold leading-tight">Meet Gabriel about...</h3>
+<span class="bg-surface-container-low text-[9px] px-2 py-0.5 rounded-full font-bold">14 min</span>
+</div>
+<div class="flex gap-2 mt-4">
+<button class="flex-1 py-2 text-[10px] font-bold bg-surface-container-high rounded-xl">Later</button>
+<button class="flex-1 py-2 text-[10px] font-bold bg-surface-container-high rounded-xl">Details</button>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex flex-col gap-1 mb-8">
+<div class="text-[#9127c4] font-semibold flex items-center gap-3 py-2 px-4 cursor-pointer">
+<span class="material-symbols-outlined">calendar_today</span> Calendar
+            </div>
+<div class="text-[#AEAEB2] flex items-center gap-3 py-2 px-4 hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined">check_circle</span> Tasks
+            </div>
+<div class="text-[#AEAEB2] flex items-center gap-3 py-2 px-4 hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined">insert_chart</span> Analytics
+            </div>
+<div class="text-[#AEAEB2] flex items-center gap-3 py-2 px-4 hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span> Settings
+            </div>
+</nav>
+<!-- Categories & Progress -->
+<div class="mt-auto space-y-4">
+<div class="space-y-3">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-[11px] font-medium">
+<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#bf5af2]"></span> Personal</span>
+<span class="text-outline">75%</span>
+</div>
+<div class="w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
+<div class="bg-[#bf5af2] h-full w-[75%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-[11px] font-medium">
+<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-tertiary-container"></span> Work</span>
+<span class="text-outline">40%</span>
+</div>
+<div class="w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
+<div class="bg-tertiary-container h-full w-[40%]"></div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-72 bg-white flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar: Month, Week, Day -->
+<header class="flex justify-between items-center w-full pl-8 pr-12 h-24 sticky top-0 bg-white/80 backdrop-blur-xl z-40">
+<div class="flex items-baseline gap-4">
+<h1 class="text-[2.5rem] font-bold tracking-tight text-on-surface">December, 2023</h1>
+<button class="bg-surface-container-low px-4 py-1.5 rounded-full text-xs font-bold hover:bg-surface-container-high transition-colors">Today</button>
+</div>
+<div class="flex items-center gap-6">
+<div class="bg-surface-container-low p-1 rounded-full flex">
+<button class="px-6 py-1.5 rounded-full text-xs font-bold text-outline hover:text-on-surface transition-all">Month</button>
+<button class="px-6 py-1.5 rounded-full text-xs font-bold bg-white shadow-sm text-on-surface transition-all">Week</button>
+<button class="px-6 py-1.5 rounded-full text-xs font-bold text-outline hover:text-on-surface transition-all">Day</button>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-low rounded-full transition-colors">search</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-low rounded-full transition-colors">notifications</span>
+</div>
+</div>
+</header>
+<!-- Calendar Container -->
+<div class="flex-1 overflow-y-auto px-8 pb-12 relative">
+<!-- Weekday Header -->
+<div class="grid grid-cols-[72px_repeat(7,1fr)] mb-4">
+<div class="w-[72px]"></div>
+<div class="text-center py-2"><p class="text-[10px] font-bold text-outline mb-1">SUN</p><p class="text-xl font-bold">16</p></div>
+<div class="text-center py-2 bg-on-surface rounded-2xl text-white shadow-lg shadow-on-surface/20 transform scale-105 z-10"><p class="text-[10px] font-bold opacity-70 mb-1">MON</p><p class="text-xl font-bold">17</p></div>
+<div class="text-center py-2"><p class="text-[10px] font-bold text-outline mb-1">TUE</p><p class="text-xl font-bold">18</p></div>
+<div class="text-center py-2"><p class="text-[10px] font-bold text-outline mb-1">WED</p><p class="text-xl font-bold">19</p></div>
+<div class="text-center py-2"><p class="text-[10px] font-bold text-outline mb-1">THU</p><p class="text-xl font-bold">20</p></div>
+<div class="text-center py-2"><p class="text-[10px] font-bold text-outline mb-1">FRI</p><p class="text-xl font-bold">21</p></div>
+<div class="text-center py-2"><p class="text-[10px] font-bold text-outline mb-1">SAT</p><p class="text-xl font-bold">22</p></div>
+</div>
+<!-- Grid & Timeline -->
+<div class="relative min-h-[800px] dashed-grid">
+<!-- Time Gutter -->
+<div class="absolute left-0 top-0 w-[72px] h-full flex flex-col pt-[-40px]">
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">06:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">07:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">08:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">09:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">10:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">11:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">12:00</div>
+<div class="h-20 text-[11px] font-bold text-outline flex items-start justify-end pr-4">13:00</div>
+</div>
+<!-- Event Grid Overlay -->
+<div class="grid grid-cols-[72px_repeat(7,1fr)] h-full">
+<div class="w-[72px]"></div>
+<!-- Sunday Col -->
+<div class="relative h-full">
+<!-- Booking taxi -->
+<div class="absolute top-0 left-1 right-1 h-20 bg-[#D4E8F7] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[10px] font-bold text-[#4d606c]">06:00</p>
+<p class="text-[12px] font-bold text-[#31434f] leading-tight">Booking taxi</p>
+<div class="flex -space-x-2 mt-2">
+<img alt="Attendee" class="w-4 h-4 rounded-full border border-[#D4E8F7]" data-alt="close-up of a smiling young person with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT8BLV1bJOqa_xhbLA9XMdV5A6ftkQHoZ0Be9uxhn9RXW68H3ijiSzSYVwTWDnWoude4AZUvxC0MecOS5peI9lgwNcgUnjDzPxgoZmLn416nh023lxKNQnUqbxGpDrfIieISSGscGnNKE2BUn7ctT_CsT83JEjzcnqO5fl_0bSCy2j46d-bcNBqY53F609SGUIAFXC_j5YAneUJdKRJg0gX-UZRKBFL8nteNGdQ2DRLIjESd3z3Dof6CQWJXFbMYInvCxyMcpXZbb1"/>
+<img alt="Attendee" class="w-4 h-4 rounded-full border border-[#D4E8F7]" data-alt="professional woman in a creative office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZLPW7FqHyKZu7w3Xk4CgmaAJ6YbuipNMWEnSj1BhgswbSsiWyAgK098ciMcajCVXHrl5CvFuZiO5DRfZoi7AP6nOMLogfRD98ccPhL_I6QasBEPe5e5KOpJ88fOCNq60t6J1Tm3k8Y5GcNM0oM9fONaZML7hma2mvIieAP16mAEf3yym6zr5VkD00d_4L2Vi-4kiIkrM9ifwS7yhCOJpQvaEWv8xU6VCVzyUF_Feaag52EAv-jM2lcw6ZdAim1dPeH4BNaMQvEbYK"/>
+<img alt="Attendee" class="w-4 h-4 rounded-full border border-[#D4E8F7]" data-alt="creative man working on a laptop in a sunlit studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATHM5sP9ayPtwMjyALi-R2te-Fff8BUeWHCgipTdQHrRh7cEtLKS-j-UPpu26_9B1lunIAMgFx0WH_y7XpNb6hr0N4ue51ifqA41sBmzbwaDv_ugB_mUw8GD8WUwFOHve3ZmvIlBuqEexw30yQFy8-n9LK-1pJk16mAgQkuZNODX6sNRqqMNLdoHjBsONo5qhHUJAiBZc-9H8uJQ5C-25z4H12ppLFe7e9wisoqvCIuc5aGOE5aH-O-10hLOKC60JY8DeBLBwkFfNq"/>
+</div>
+</div>
+<!-- Book offsite -->
+<div class="absolute top-[160px] left-1 right-1 h-16 bg-[#FFD9C4] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[12px] font-bold text-[#6e0523]">Book offsite</p>
+</div>
+</div>
+<!-- Monday Col -->
+<div class="relative h-full">
+<!-- Design onboarding -->
+<div class="absolute top-0 left-1 right-1 h-12 bg-[#E4D4F7] rounded-xl p-2 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer overflow-hidden">
+<p class="text-[11px] font-bold text-primary leading-tight">Design onboarding</p>
+</div>
+<!-- Dashed border empty create card -->
+<div class="absolute top-12 left-1 right-1 h-8 border-2 border-dashed border-outline-variant/30 rounded-xl flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-xs">add</span>
+</div>
+<!-- Design session -->
+<div class="absolute top-[80px] left-1 right-1 h-32 bg-[#FFF3C4] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-[10px] font-bold text-on-surface/60">07:00</p>
+<p class="text-[12px] font-bold text-on-surface leading-tight">Design session</p>
+</div>
+<img alt="Project" class="w-8 h-8 rounded-lg object-cover" data-alt="vibrant abstract design pattern with soft organic shapes and pastel colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOMzxUEhxlN2S2TrG5hGY82mukrzumIrIPLNqTIG88r8Y1Jag-M-uIfh2ivWMfew-SIos9bNB5A0K0wAwyg4UwatjPv48oWLD3KK-CRuy3_JNddTmWASIO-JSNYn_WjrOk6Ucn_aeY6Mg-j5fxHSmHAn5CAQleI050nh4iTT3a7sKtrcZcpi-l4YrXOByBSZGgFi2KviEDcgdAKL2mo3lejUOb6Fk9RxaAv8sJHJeUGlSGne4Z5UoxYgBa-_TfnxQS0oZAMB7cQ2uV"/>
+</div>
+</div>
+</div>
+<!-- Tuesday Col -->
+<div class="relative h-full">
+<!-- Dev meet -->
+<div class="absolute top-[160px] left-1 right-1 h-20 bg-[#D4F4DD] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[12px] font-bold text-[#2e333a] leading-tight">Dev meet</p>
+<div class="flex -space-x-2 mt-2">
+<img alt="Dev" class="w-4 h-4 rounded-full border border-[#D4F4DD]" data-alt="smiling male developer with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkNGgiffbSRF9secYkrXdCZv01JYfuN8uTTCY-4eUbrPvJJ3Bbd5dMpSvF6ZHK9lB7sxKOfx0JAB1QTqTZSZKHH3tLGV_rv8dAiNU510SNaDIV1CnjuLr3RaWzwGAHR3TeEL5BGiGuGHBsriyebKgcZFy1mFrB-kpA8cmGjzO9qAE57crkOCNiynEx7z7g23Wjz4NBM54sSTyjKXxqwvPvKn8BE0Z_8SkelISPPrl47lrjEwLlMcdY8CDor28vVJoyDynerUNcoxVt"/>
+<img alt="Dev" class="w-4 h-4 rounded-full border border-[#D4F4DD]" data-alt="professional female programmer at work" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu6rD1RxeIfyll7kC2c8T7npIkOIufUQFdG0koVRHGFoP20XsMWIOxl1RbdYBSzOkRYx37E-dsX4IXD5IhA6JtpieU_OcpL76GjHoSstJqRML69aWq7NI65Ox05FtbVUhy346gsKo3f1McAjc6tbmU3W08X5tF-Rs0EcR4_-_SZQg2YKz0_DIq-hhAL-ABuzo7ybla8DlFLTGkzKCTNAc6Wc40ijn4ZehbQJ9Qkli2iIfzs5nrSGtHJ0SA71EKLZVV6Fe0cjFw2-e4"/>
+<img alt="Dev" class="w-4 h-4 rounded-full border border-[#D4F4DD]" data-alt="young tech lead with a friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg13UoBh6nUXW50a7fQg7es1A0ti3369kp413q8Zhi9HDe7YdGJG9vJkps3Wlt1hUNn7Ap4PK-Gotvj_GGTrcqaNFqeFomXcoqcol8h0amJytiM1tbSjyi7f4StjhPOF8sJaKcWRAtLWjhzo_v9qvkSN12E9Ep9fePWFZxsI2sXrXajA2SzTflKEjnq0EShXdhN9SDhW5hTTTHRYpj-P2GiIxW236IJ6dImyEJnTYvnrkjVRN4h7PBsl6Cp5gLNvVSmU_C7kGInv2G"/>
+<img alt="Dev" class="w-4 h-4 rounded-full border border-[#D4F4DD]" data-alt="senior software engineer in focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDACaP1Zfmmo8sTajdA4BZkb2kQzJO4WaJZINZnyTkrE-Ej77PIQDPChlgP4AOMId9SxmFnKiOfa4S8FexRTrzv2ZP4k3M8-N6LFvNi3fzP8Nc1_aND-5R6YXY_8zkTYQVusRbvsGheW6GeDcSrhy-Az1GwZYg2nzoyZLVbGGU3U3u3WU8P6yS7WCGqhoFs5Qa8Ats-JBf_8MujmDN2vnKI8EaZmA8ZkSFC8eK49bvRWHNkzqsSSiosftS62h_KN7SnBxb0An2e4rkV"/>
+</div>
+</div>
+</div>
+<!-- Wednesday Col -->
+<div class="relative h-full">
+<!-- Design Review -->
+<div class="absolute top-[240px] left-1 right-1 h-24 bg-[#FFD9C4] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[12px] font-bold text-on-surface leading-tight">Design Review</p>
+<p class="text-[10px] mt-1 opacity-60">Iteration 2.0</p>
+</div>
+</div>
+<!-- Thursday Col -->
+<div class="relative h-full">
+<!-- New project -->
+<div class="absolute top-[320px] left-1 right-1 h-24 bg-[#FFD9C4] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[12px] font-bold text-on-surface leading-tight">New project</p>
+<div class="mt-2 inline-block px-2 py-0.5 bg-white/50 rounded text-[9px] font-bold">Client's Brief</div>
+</div>
+</div>
+<!-- Friday Col -->
+<div class="relative h-full">
+<!-- Design website -->
+<div class="absolute top-[240px] left-1 right-1 h-24 bg-[#F5F1E8] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[12px] font-bold text-on-surface leading-tight">Design website</p>
+</div>
+<!-- Onboarding meet -->
+<div class="absolute top-[400px] left-1 right-1 h-20 bg-[#FADCE5] rounded-xl p-3 shadow-sm group hover:scale-[1.02] transition-transform cursor-pointer">
+<p class="text-[12px] font-bold text-on-surface leading-tight">Onboarding meet</p>
+<div class="flex -space-x-2 mt-2">
+<img alt="HR" class="w-4 h-4 rounded-full border border-[#FADCE5]" data-alt="corporate headshot of a friendly human resources manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZnwX_5ukOFd0GZrdjmIvVlhGCpYZHRILFvblc0qgnxCfxpvqgnrRSoxLzJjIQh9VdYG2iMNeTM3fbNcfTr278y46SB6WSvoEXLLFeVeRZXxZSai4QwQCe_RzqflGg6hncaFvWDX5qpmhPOuEhuV42ocYw2_B-UVTOqugEh2Rbzr_k9kdKec1VSA7WdLfO9HHOOn0EYBpntjTpfnlssYbyzVNzXxQkhNBidnBYYwYKE5VDJ6T8DsWYja81o39YMdqLSmXrklX2HRxI"/>
+<img alt="HR" class="w-4 h-4 rounded-full border border-[#FADCE5]" data-alt="smiling HR representative in a modern lobby" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFulmh-_WZn7caBfSNN46f8ov6OTXfbZalP_wrceB0yNEOWZGylU4cUXGvr5ZnQsn-pGfZ825smse2B6Mo3mvrYS1EZS6dqHrptnlW_Sw3UanThGqAGg6ehz717SADCVErDmUolr0eE7B430u1gV78egiISdY64577SVNZvt4ugyqHvki_cZPtol1UL3MwnvRJJEhC75nojA-maz8SH0ZPhwV8hgWNVmwfHibVI7faxxp-eShbpmv28anzoJw1TjaG1klGVv0Nk_Xl"/>
+<img alt="HR" class="w-4 h-4 rounded-full border border-[#FADCE5]" data-alt="professional person looking directly at camera with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxXxWLp-JyzaOl1qm8WKoT7CyKv_-758xz7ibk4ISgdJUY8fveW0VMStEL-83d2uKBczmACEJ2c80eMX47GSb3DlVKSX_3BqCggYtdrczcPFzejhfufyKtnaYge4wpElOouYUO3pZ2t-5mjii5b2bph4o3fspewRkcDJ7kIUjY6Ar4a8vcKKFdGyzmbj_tlCWf5EjQ80nW1Zhd0dtqpdkgh2v7_aWwjNCNApGNm8xNmfxumo7WJQGahBdwZ8ed7bJ7opOG8MonjbED"/>
+</div>
+</div>
+</div>
+<!-- Saturday Col -->
+<div class="relative h-full border-l border-outline-variant/10"></div>
+</div>
+</div>
+</div>
+<!-- Modal Overlay (Meet with Jonson Rider) -->
+<div class="fixed inset-0 bg-on-surface/5 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-none">
+<div class="w-[380px] glass-panel rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-white/50 pointer-events-auto transform translate-x-32 translate-y-24">
+<!-- Modal Title -->
+<div class="mb-6">
+<div class="flex items-center gap-1">
+<h2 class="text-2xl font-bold tracking-tight">Meet with Jonson Rider</h2>
+<span class="w-0.5 h-6 bg-primary animate-pulse"></span>
+</div>
+</div>
+<!-- Form Rows -->
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">calendar_today</span>
+<div class="text-sm font-semibold">Tuesday, 18 December</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">schedule</span>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1.5 bg-surface-container-low rounded-xl text-xs font-bold">06:00</span>
+<span class="text-outline text-xs">→</span>
+<span class="px-3 py-1.5 bg-surface-container-low rounded-xl text-xs font-bold">07:00</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">location_on</span>
+<div class="text-sm font-medium">Park Lane Office</div>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="px-3 py-1 bg-[#E4D4F7] text-primary text-[10px] font-bold rounded-full">Design</span>
+<span class="px-3 py-1 bg-[#D4E8F7] text-[#4d606c] text-[10px] font-bold rounded-full">Personal project</span>
+<span class="px-3 py-1 bg-[#D4F4DD] text-[#2e333a] text-[10px] font-bold rounded-full">Developer task</span>
+</div>
+<!-- Attendees -->
+<div class="flex items-center justify-between pt-2">
+<div class="flex -space-x-3">
+<img alt="Jonson" class="w-8 h-8 rounded-full border-2 border-white" data-alt="close-up portrait of a young male creative director with professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfKluLv2vyYJrXjEoYMF-3JbPDQQWXZ7qa-klzXrM8GYIRspsqfHlaA48uIxRman0aZhRosP5a7eynZkJzDD7cs_wMbShpHCE1rWP7cJIcUNmdKZvmxRUc9ZWsMJfazT6qlAifU0nKbweaktwUNfSuKNaBR66wkBAjG0GKCYSnexP1hYpxhZnO9Z2HVzEpcDFmv3hLkZWtt27uUHpN5yVcnyE9sNIwakgS8lxEmh2ty59std-virgsqLelnfPz5JV91Lm9kvCe9PJ9"/>
+<img alt="Antonio" class="w-8 h-8 rounded-full border-2 border-white" data-alt="smiling designer at their desk with a warm glowing light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsLda-0viK4QTMWbSQYIQmQB0HRonBg8eXb5PoPKEGeUmTDWsR4oD5sQ68KGycLVPIGOaV-Z-TqxEaSggoxgd4PjXZXASJoBQDUL9pmyzqMTh7Rwn7gLbpe_RS6xWdj3WFzLl01sMStJQRLuA94Oads_n80cia8HFnc6fkQJaFCdl09c2K0O27fJ1jVKclgnclOjYmgI5t_6ZFGpaE7ZU0vM8gLz8RzL7tPm5Dq5BuGlMltzzhjt390DYBjCx2EF8876qB7tYBUJGk"/>
+<img alt="Sarah" class="w-8 h-8 rounded-full border-2 border-white" data-alt="creative woman with glasses in a light filled office space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8c6e1KA5KOKRx-N5ocoMPbH7Iob2pNfTp36V784wQOqk1XwjApdKK4CItZhMWZ5DHDa1iWdTlfkldD261ld5y3IDNll9DfMr3OWpiRZi4nKGHajzfw-ImBkZddtDTZ2YZl8tb_tGOMZhaVMrkVIV_cIwQ8Dyqh6AQM_tY0PSc9xZC5rgR8N2yoXSqkmZtDz603DaEXHVCaJi3aPuq0gu87PJu3xiiseQemRhQsGGgzY4F8qfBPT-FcYpvQY3LqMWbJn2Jk740c3CF"/>
+<img alt="Ken" class="w-8 h-8 rounded-full border-2 border-white" data-alt="professional person in business casual attire with soft background bokeh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_P51-_ABvI9klzkIg3D7L4S412HHCygMcBw5ILhnaXNr7C7cE4C08Ln53itQOCo9qssztRKWWJj_gllZr_LW-rL-Ht_IAvIdHR2GLYMJfQzcMArn03H50lT7JM8SJ40PhY4_QnZNq6tY4UnxUlG5s0-odsPOORzTZq3ST1Qki2GY5VqdSvfnmv3aMaCSCgKCQV3BGzqL9W_bcqTK9uf78JhBBwUmDnlnB67fv39pWJnnQ8Z2SpzdBp3ShoK_pIW7TcReW1ED6IaWu"/>
+<button class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+<span class="material-symbols-outlined text-sm font-bold">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="mt-10 flex gap-3">
+<button class="flex-1 py-4 bg-on-surface text-white text-sm font-bold rounded-2xl shadow-lg shadow-on-surface/20 active:scale-[0.98]">Add Event</button>
+<button class="w-14 py-4 bg-surface-container-high rounded-2xl flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>
