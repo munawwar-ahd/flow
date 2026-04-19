@@ -55,20 +55,8 @@ export function NextUpCard() {
     return all[0] ?? null;
   }, [tasks, events, categories, now]);
 
-  // Spec allows either hide-entirely or a subtle empty state — we pick
-  // the subtle empty state so the contextual panel keeps its shape.
-  if (!next) {
-    return (
-      <div className="rounded-[1.75rem] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] bg-bg-elevated">
-        <div className="text-[11px] font-bold tracking-wide uppercase text-text-tertiary">
-          Next up
-        </div>
-        <div className="text-body text-text-secondary mt-2">
-          Nothing upcoming.
-        </div>
-      </div>
-    );
-  }
+  // Per spec: hide the card entirely when nothing upcoming.
+  if (!next) return null;
 
   const start = new Date(next.startAt);
   const minsAway = Math.max(0, differenceInMinutes(start, now));
@@ -84,7 +72,7 @@ export function NextUpCard() {
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={spring.gentle}
-      className="rounded-[1.75rem] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] bg-bg-elevated"
+      className="rounded-3xl p-5 shadow-card bg-bg-elevated"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">

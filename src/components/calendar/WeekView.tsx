@@ -1,8 +1,8 @@
 "use client";
-import { useMemo } from "react";
-import { addDays, format, isSameDay, isToday, startOfWeek } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
+import { addDays, format, isToday, startOfWeek } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Task, TaskCategory } from "@/types/models";
+import type { Task, TaskCategory, CalendarEvent } from "@/types/models";
 import { useTasks } from "@/stores/tasks";
 import { useEvents } from "@/stores/events";
 import { useUI } from "@/stores/ui";
@@ -16,13 +16,73 @@ type Props = {
   startHour?: number;
   endHour?: number;
   onEmptySlotClick?: (iso: string) => void;
+  onDayClick?: (d: Date) => void;
 };
 
-const HOUR_ROW_PX = 80; // matches reference dashed-grid
+const HOUR_ROW_PX = 80;
 const GUTTER_PX = 72;
+const OVERLAP_GAP_PX = 2;
+
+/** Normalize an item to a timeline block descriptor. */
+type Block = {
+  id: string;
+  title: string;
+  startAt: string;
+  durationMin: number;
+  pastel: string;
+  completed?: boolean;
+  onClick?: () => void;
+  // Filled in by the overlap packer:
+  col: number;
+  cols: number;
+};
 
 function minutesSinceStart(date: Date, startHour: number): number {
   return (date.getHours() - startHour) * 60 + date.getMinutes();
+}
+
+/** Assign {col, cols} to each block so overlapping items split the column. */
+function packOverlaps(blocks: Block[]): Block[] {
+  if (blocks.length === 0) return blocks;
+  const sorted = [...blocks].sort((a, b) => a.startAt.localeCompare(b.startAt));
+  const endOf = (b: Block) => new Date(b.startAt).getTime() + b.durationMin * 60_000;
+
+  // Partition into overlap clusters.
+  const clusters: Block[][] = [];
+  for (const b of sorted) {
+    const last = clusters[clusters.length - 1];
+    const clusterMaxEnd = last
+      ? last.reduce((m, x) => Math.max(m, endOf(x)), 0)
+      : 0;
+    if (!last || new Date(b.startAt).getTime() >= clusterMaxEnd) {
+      clusters.push([b]);
+    } else {
+      last.push(b);
+    }
+  }
+
+  for (const g of clusters) {
+    const cols: Block[][] = [];
+    for (const b of g) {
+      let placed = false;
+      for (let c = 0; c < cols.length; c++) {
+        const prev = cols[c][cols[c].length - 1];
+        if (new Date(b.startAt).getTime() >= endOf(prev)) {
+          cols[c].push(b);
+          b.col = c;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        cols.push([b]);
+        b.col = cols.length - 1;
+      }
+    }
+    const cnt = cols.length;
+    for (const b of g) b.cols = cnt;
+  }
+  return sorted;
 }
 
 export function WeekView({
@@ -31,6 +91,7 @@ export function WeekView({
   startHour = 6,
   endHour = 23,
   onEmptySlotClick,
+  onDayClick,
 }: Props) {
   const tasks = useTasks((s) => s.tasks);
   const events = useEvents((s) => s.events);
@@ -55,6 +116,22 @@ export function WeekView({
 
   const totalHeight = hours.length * HOUR_ROW_PX;
 
+  const weekHasAnything = useMemo(() => {
+    const start = daysList[0];
+    const end = addDays(daysList[daysList.length - 1], 1);
+    const startMs = new Date(start).setHours(0, 0, 0, 0);
+    const endMs = new Date(end).setHours(0, 0, 0, 0);
+    const anyTask = tasks.some((t) => {
+      const m = new Date(t.startAt).getTime();
+      return m >= startMs && m < endMs;
+    });
+    if (anyTask) return true;
+    return events.some((e) => {
+      const m = new Date(e.startAt).getTime();
+      return m >= startMs && m < endMs;
+    });
+  }, [tasks, events, daysList]);
+
   return (
     <div
       className="relative"
@@ -67,40 +144,44 @@ export function WeekView({
       <div />
       {daysList.map((d) => {
         const today = isToday(d);
+        const isActive = +d === +anchor && days === 1;
         return (
-          <div key={d.toISOString()} className="px-1 pb-4 flex flex-col items-center">
-            <motion.div
-              initial={false}
-              animate={{ scale: today ? 1.03 : 1 }}
-              transition={spring.gentle}
+          <motion.button
+            key={d.toISOString()}
+            type="button"
+            onClick={() => onDayClick?.(d)}
+            whileTap={{ scale: 0.98 }}
+            transition={spring.snappy}
+            aria-label={`${format(d, "EEEE")}, ${format(d, "d MMMM")} — open Day view`}
+            className={cn(
+              "group mx-1 mb-4 py-2.5 rounded-2xl text-center focus-ring transition-colors cursor-pointer",
+              today
+                ? "text-[color:var(--today-pill-ink)]"
+                : isActive
+                  ? "bg-bg-secondary text-text-primary"
+                  : "text-text-primary hover:bg-bg-secondary/70"
+            )}
+            style={
+              today
+                ? {
+                    background: "var(--today-pill-bg)",
+                    boxShadow: "var(--today-pill-shadow)",
+                  }
+                : undefined
+            }
+          >
+            <div
               className={cn(
-                "w-full text-center py-2.5 rounded-2xl",
-                today
-                  ? "text-[color:var(--today-pill-ink)]"
-                  : "text-text-primary"
+                "text-[10px] font-bold tracking-[0.1em] mb-1",
+                today ? "opacity-70" : "text-text-tertiary"
               )}
-              style={
-                today
-                  ? {
-                      background: "var(--today-pill-bg)",
-                      boxShadow: "var(--today-pill-shadow)",
-                    }
-                  : undefined
-              }
             >
-              <div
-                className={cn(
-                  "text-[10px] font-bold tracking-[0.1em] mb-1",
-                  today ? "opacity-70" : "text-text-tertiary"
-                )}
-              >
-                {format(d, "EEE").toUpperCase()}
-              </div>
-              <div className="text-xl font-bold tabular-nums leading-none">
-                {format(d, "d")}
-              </div>
-            </motion.div>
-          </div>
+              {format(d, "EEE").toUpperCase()}
+            </div>
+            <div className="text-xl font-bold tabular-nums leading-none">
+              {format(d, "d")}
+            </div>
+          </motion.button>
         );
       })}
 
@@ -132,6 +213,27 @@ export function WeekView({
           onEmptySlotClick={onEmptySlotClick}
         />
       ))}
+
+      {!weekHasAnything && (
+        <div
+          className="pointer-events-none absolute inset-x-0 flex flex-col items-center justify-center text-center"
+          style={{ top: 80, height: totalHeight }}
+          aria-hidden
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={spring.gentle}
+          >
+            <div className="text-body text-text-tertiary">
+              {days === 1 ? "Nothing scheduled today" : "Nothing scheduled this week"}
+            </div>
+            <div className="text-caption text-text-tertiary/70 mt-1">
+              Click any time to add an event
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
@@ -142,7 +244,7 @@ type DayColProps = {
   startHour: number;
   totalHeight: number;
   tasks: Task[];
-  events: ReturnType<typeof useEvents.getState>["events"];
+  events: CalendarEvent[];
   categories: TaskCategory[];
   onSelectTask: (id: string) => void;
   onEmptySlotClick?: (iso: string) => void;
@@ -164,24 +266,51 @@ function DayColumn({
   const dayEnd = new Date(dayStart);
   dayEnd.setDate(dayEnd.getDate() + 1);
 
-  const dayTasks = tasks.filter((t) => {
-    const s = new Date(t.startAt);
-    return s >= dayStart && s < dayEnd;
-  });
-  const dayEvents = events.filter((e) => {
-    const s = new Date(e.startAt);
-    return s >= dayStart && s < dayEnd && !e.allDay;
-  });
+  const blocks: Block[] = useMemo(() => {
+    const out: Block[] = [];
+    for (const t of tasks) {
+      const s = new Date(t.startAt);
+      if (s < dayStart || s >= dayEnd) continue;
+      const cat = categories.find((c) => c.id === t.categoryId);
+      out.push({
+        id: `t:${t.id}`,
+        title: t.title,
+        startAt: t.startAt,
+        durationMin: t.durationMin,
+        pastel: pastelVar(cat ?? null),
+        completed: t.completed,
+        onClick: () => onSelectTask(t.id),
+        col: 0,
+        cols: 1,
+      });
+    }
+    for (const e of events) {
+      const s = new Date(e.startAt);
+      if (s < dayStart || s >= dayEnd || e.allDay) continue;
+      const durMin = Math.max(
+        15,
+        Math.round((new Date(e.endAt).getTime() - s.getTime()) / 60_000)
+      );
+      out.push({
+        id: `e:${e.id}`,
+        title: e.title,
+        startAt: e.startAt,
+        durationMin: durMin,
+        pastel: "var(--event-1)",
+        col: 0,
+        cols: 1,
+      });
+    }
+    return packOverlaps(out);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tasks, events, categories, dayStart.getTime(), dayEnd.getTime()]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!onEmptySlotClick) return;
-    // Ignore clicks that landed on an event block (button) — only bare
-    // timeline surface should create a new event.
     if ((e.target as HTMLElement).closest("button")) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    // Round down to the clicked hour so tapping anywhere in the 3pm
-    // row lands at 15:00 (spec: "pre-fill start time to the clicked hour").
+    // Round DOWN to the clicked hour per spec.
     const hoursFromStart = Math.max(0, Math.floor(y / HOUR_ROW_PX));
     const d = new Date(dayStart);
     d.setHours(startHour + hoursFromStart, 0, 0, 0);
@@ -203,49 +332,36 @@ function DayColumn({
         />
       ))}
 
-      {/* Task blocks — wrapped in AnimatePresence(initial=false) so new
-          items pop in while existing ones don't flicker on week nav. */}
+      {isToday(day) && (
+        <NowIndicator startHour={startHour} endHour={hours[hours.length - 1]} />
+      )}
+
       <AnimatePresence initial={false}>
-        {dayTasks.map((t) => {
-          const start = new Date(t.startAt);
+        {blocks.map((b, i) => {
+          const start = new Date(b.startAt);
           const mins = minutesSinceStart(start, startHour);
           const top = (mins / 60) * HOUR_ROW_PX;
-          const height = Math.max(36, (t.durationMin / 60) * HOUR_ROW_PX);
-          const cat = categories.find((c) => c.id === t.categoryId);
+          const height = Math.max(24, (b.durationMin / 60) * HOUR_ROW_PX);
+          const widthPct = 100 / b.cols;
+          const leftPct = b.col * widthPct;
           return (
             <EventBlock
-              key={t.id}
+              key={b.id}
               top={top}
               height={height}
-              title={t.title}
+              leftPct={leftPct}
+              widthPct={widthPct}
+              title={b.title}
               timeLabel={format(start, "HH:mm")}
-              pastel={pastelVar(cat ?? null)}
-              completed={t.completed}
-              onClick={() => onSelectTask(t.id)}
+              durationMin={b.durationMin}
+              pastel={b.pastel}
+              completed={b.completed}
+              staggerIndex={i}
+              onClick={b.onClick}
             />
           );
         })}
       </AnimatePresence>
-
-      {/* External events */}
-      {dayEvents.map((e) => {
-        const start = new Date(e.startAt);
-        const end = new Date(e.endAt);
-        const mins = minutesSinceStart(start, startHour);
-        const top = (mins / 60) * HOUR_ROW_PX;
-        const durMin = Math.max(15, (end.getTime() - start.getTime()) / 60000);
-        const height = Math.max(36, (durMin / 60) * HOUR_ROW_PX);
-        return (
-          <EventBlock
-            key={e.id}
-            top={top}
-            height={height}
-            title={e.title}
-            timeLabel={format(start, "HH:mm")}
-            pastel="var(--event-1)"
-          />
-        );
-      })}
     </div>
   );
 }
@@ -253,52 +369,118 @@ function DayColumn({
 function EventBlock({
   top,
   height,
+  leftPct,
+  widthPct,
   title,
   timeLabel,
+  durationMin,
   pastel,
   completed,
+  staggerIndex,
   onClick,
 }: {
   top: number;
   height: number;
+  leftPct: number;
+  widthPct: number;
   title: string;
   timeLabel?: string;
+  durationMin: number;
   pastel: string;
   completed?: boolean;
+  staggerIndex: number;
   onClick?: () => void;
 }) {
+  // Tiered rendering by duration
+  const tier = durationMin < 30 ? "xs" : durationMin < 60 ? "sm" : "md";
+
+  const padding =
+    tier === "xs" ? "px-2 py-1.5" : tier === "sm" ? "px-2.5 py-2" : "px-3 py-2.5";
+
+  const titleClass =
+    tier === "xs"
+      ? "text-[11px] font-bold leading-tight"
+      : tier === "sm"
+        ? "text-[12px] font-bold leading-tight"
+        : "text-[13px] font-bold leading-tight";
+
+  const timeClass =
+    tier === "sm"
+      ? "text-[10px] font-semibold"
+      : "text-[11px] font-semibold";
+
   return (
     <motion.button
-      onClick={onClick}
-      initial={{ opacity: 0, scale: 0.94 }}
-      animate={{ opacity: completed ? 0.55 : 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.94 }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.99 }}
-      transition={spring.gentle}
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: completed ? 0.55 : 1, y: 0 }}
+      exit={{ opacity: 0, y: 4, scale: 0.94 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ ...spring.gentle, delay: staggerIndex * 0.02 }}
       className={cn(
-        "absolute left-1 right-1 rounded-xl p-3 text-left overflow-hidden focus-ring",
-        "shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)]"
+        "absolute rounded-xl overflow-hidden focus-ring text-left cursor-pointer",
+        "shadow-sm hover:shadow-card transition-shadow",
+        padding
       )}
-      style={{ top, height, background: pastel }}
+      style={{
+        top,
+        height,
+        left: `calc(${leftPct}% + ${leftPct > 0 ? OVERLAP_GAP_PX : 0}px)`,
+        width: `calc(${widthPct}% - ${leftPct > 0 ? OVERLAP_GAP_PX * 2 : OVERLAP_GAP_PX}px)`,
+        background: pastel,
+      }}
     >
-      {timeLabel && (
+      {tier === "xs" ? (
         <div
-          className="text-[10px] font-semibold"
-          style={{ color: "var(--event-ink-soft)" }}
+          className={cn(titleClass, "truncate")}
+          style={{ color: "var(--event-ink)" }}
         >
-          {timeLabel}
+          {title}
         </div>
+      ) : (
+        <>
+          {timeLabel && (
+            <div
+              className={cn(timeClass, "truncate")}
+              style={{ color: "var(--event-ink-soft)" }}
+            >
+              {timeLabel}
+            </div>
+          )}
+          <div
+            className={cn(titleClass, "truncate")}
+            style={{ color: "var(--event-ink)" }}
+          >
+            {title}
+          </div>
+        </>
       )}
-      <div
-        className={cn(
-          "text-[12px] font-bold leading-tight truncate",
-          completed && "line-through"
-        )}
-        style={{ color: "var(--event-ink)" }}
-      >
-        {title}
-      </div>
     </motion.button>
+  );
+}
+
+function NowIndicator({ startHour, endHour }: { startHour: number; endHour: number }) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const h = now.getHours() + now.getMinutes() / 60;
+  if (h < startHour || h > endHour) return null;
+  const top = (h - startHour) * HOUR_ROW_PX;
+  return (
+    <div
+      className="pointer-events-none absolute left-0 right-0 z-20 flex items-center"
+      style={{ top, transform: "translateY(-50%)" }}
+      aria-hidden
+    >
+      <div className="w-2 h-2 -ml-1 rounded-full bg-danger shadow-[0_0_0_3px_rgba(255,59,48,0.15)]" />
+      <div className="flex-1 h-[2px] bg-danger/85" />
+    </div>
   );
 }

@@ -7,7 +7,7 @@ import {
   format,
   startOfWeek,
 } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import {
   Bell,
   ChevronLeft,
@@ -23,7 +23,6 @@ import { MonthView } from "@/components/calendar/MonthView";
 import { DayView } from "@/components/calendar/DayView";
 import { MiniMonth } from "@/components/calendar/MiniMonth";
 import { NextUpCard } from "@/components/calendar/NextUpCard";
-import { CategoryProgress } from "@/components/calendar/CategoryProgress";
 import { EventModal } from "@/components/calendar/EventModal";
 import { SegmentedControl } from "@/components/shared/SegmentedControl";
 import { UserMenu } from "@/components/shared/UserMenu";
@@ -106,6 +105,7 @@ export default function CalendarPage() {
   const weekDays = isDesktop ? 7 : isTablet ? 3 : 1;
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="flex h-screen bg-bg-primary">
       {/* Contextual panel (desktop only, inline) */}
       {isDesktop && (
@@ -241,7 +241,7 @@ export default function CalendarPage() {
             openCreateAt(now.toISOString());
           }}
           aria-label="New event"
-          className="absolute right-6 bottom-6 md:right-8 md:bottom-8 z-20 h-12 px-5 rounded-full bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] font-bold text-sm flex items-center gap-2 shadow-[0_8px_24px_rgba(0,0,0,0.18)] focus-ring"
+          className="absolute right-6 bottom-6 md:right-8 md:bottom-8 z-20 h-12 px-5 rounded-full bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] font-bold text-sm flex items-center gap-2 shadow-lg cursor-pointer focus-ring hover:brightness-110 transition-[filter]"
         >
           <Plus className="w-4 h-4" />
           New Event
@@ -254,7 +254,7 @@ export default function CalendarPage() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              transition={spring.gentle}
+              transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
             >
               {view === "month" && (
                 <div className="min-h-[70vh]">
@@ -271,7 +271,15 @@ export default function CalendarPage() {
                 (isMobile ? (
                   <MobileDaySwipe anchor={anchor} setAnchor={setAnchor} openCreateAt={openCreateAt} />
                 ) : (
-                  <WeekView anchor={anchor} days={weekDays} onEmptySlotClick={openCreateAt} />
+                  <WeekView
+                    anchor={anchor}
+                    days={weekDays}
+                    onEmptySlotClick={openCreateAt}
+                    onDayClick={(d) => {
+                      setAnchor(d);
+                      setView("day");
+                    }}
+                  />
                 ))}
               {view === "day" && (
                 isMobile ? (
@@ -342,6 +350,7 @@ export default function CalendarPage() {
         onClose={() => setModal(null)}
       />
     </div>
+    </MotionConfig>
   );
 }
 
@@ -385,10 +394,6 @@ function ContextualPanelContent({
       />
 
       <NextUpCard />
-
-      <div className="mt-auto">
-        <CategoryProgress anchor={anchor} />
-      </div>
     </div>
   );
 }

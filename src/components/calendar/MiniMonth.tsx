@@ -85,8 +85,8 @@ export function MiniMonth({ month, onMonthChange, selected, onSelect }: Props) {
               transition={spring.snappy}
               onClick={() => onSelect(d)}
               className={cn(
-                "mx-auto w-7 h-7 rounded-full text-[11px] tabular-nums flex items-center justify-center transition-colors",
-                !inMonth && "text-text-tertiary/50",
+                "mx-auto w-7 h-7 rounded-full text-[11px] tabular-nums flex items-center justify-center transition-colors cursor-pointer focus-ring",
+                !inMonth && "text-text-tertiary/50 hover:bg-bg-elevated/60",
                 inMonth && !isTodayCell && !isSelected && "text-text-primary hover:bg-bg-elevated",
                 isSelected && !isTodayCell && "bg-accent-soft text-accent font-semibold"
               )}

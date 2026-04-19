@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { format, parse } from "date-fns";
-import { Calendar as CalIcon, Clock, Copy, MapPin, MoreHorizontal, Trash2 } from "lucide-react";
+import { Calendar as CalIcon, Clock, MapPin } from "lucide-react";
 import { useTasks } from "@/stores/tasks";
 import { useUI } from "@/stores/ui";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
@@ -58,7 +58,6 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
   const categories = useUI((s) => s.categories);
   const add = useTasks((s) => s.add);
   const update = useTasks((s) => s.update);
-  const remove = useTasks((s) => s.remove);
 
   const [title, setTitle] = useState("");
   const [dateStr, setDateStr] = useState("");
@@ -66,7 +65,6 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
   const [endTime, setEndTime] = useState("");
   const [location, setLocation] = useState("");
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
-  const [moreOpen, setMoreOpen] = useState(false);
   const trapRef = useFocusTrap<HTMLDivElement>(open);
   const titleRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -81,7 +79,6 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
     setEndTime(toTimeInputValue(endIso));
     setLocation((initial as { location?: string }).location ?? "");
     setCategoryId(initial.categoryId ?? categories[0]?.id);
-    setMoreOpen(false);
     setTimeout(() => titleRef.current?.focus(), 30);
   }, [open, initial, categories]);
 
@@ -140,28 +137,6 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
     onClose();
   };
 
-  const handleDelete = async () => {
-    if (mode === "edit" && initial?.id) {
-      await remove(initial.id);
-    }
-    setMoreOpen(false);
-    onClose();
-  };
-
-  const handleDuplicate = async () => {
-    if (!initial) return;
-    const startIso = dateStr && startTime ? composeIso(dateStr, startTime) : initial.startAt;
-    const endIso = endTime ? composeIso(dateStr, endTime) : addMinutesIso(startIso, initial.durationMin ?? 60);
-    await add({
-      title: (title || initial.title || "Untitled").trim(),
-      startAt: startIso,
-      durationMin: Math.max(15, diffMinutes(startIso, endIso)),
-      categoryId,
-    });
-    setMoreOpen(false);
-    onClose();
-  };
-
   const prettyDate = useMemo(() => {
     if (!dateStr) return "Pick a date";
     try {
@@ -178,7 +153,7 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: 0.15 }}
           className="fixed inset-0 z-[70] flex items-center justify-center px-4 pt-safe pb-safe"
         >
           <div
@@ -191,11 +166,11 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
             role="dialog"
             aria-modal="true"
             aria-label={mode === "create" ? "New event" : "Edit event"}
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={spring.gentle}
-            className="relative w-full max-w-[400px] rounded-3xl p-7 border border-separator backdrop-blur-2xl backdrop-saturate-150 shadow-[0_20px_60px_rgba(0,0,0,0.18)]"
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ ...spring.gentle, duration: 0.25 }}
+            className="relative w-full max-w-[400px] rounded-3xl p-7 border border-separator backdrop-blur-2xl backdrop-saturate-150 shadow-2xl"
             style={{ background: "var(--glass-bg)" }}
           >
             <div className="mb-5 flex items-center gap-1">
@@ -296,60 +271,21 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
               )}
             </div>
 
-            <div className="mt-8 flex gap-3 relative">
+            <div className="mt-8">
               <motion.button
                 whileTap={canSubmit ? tap : undefined}
                 transition={spring.snappy}
                 onClick={submit}
                 disabled={!canSubmit}
                 className={cn(
-                  "flex-1 py-4 text-sm font-bold rounded-2xl transition-opacity focus-ring",
+                  "w-full py-4 text-sm font-bold rounded-2xl transition-opacity focus-ring",
                   canSubmit
-                    ? "bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] shadow-lg cursor-pointer"
+                    ? "bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] shadow-card cursor-pointer"
                     : "bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] opacity-35 cursor-not-allowed"
                 )}
               >
                 {mode === "create" ? "Add Event" : "Save Changes"}
               </motion.button>
-              <motion.button
-                whileTap={tap}
-                transition={spring.snappy}
-                onClick={() => setMoreOpen((v) => !v)}
-                aria-label="More options"
-                aria-expanded={moreOpen}
-                className="w-14 py-4 rounded-2xl bg-bg-secondary hover:bg-bg-elevated text-text-primary flex items-center justify-center focus-ring"
-              >
-                <MoreHorizontal className="w-5 h-5" />
-              </motion.button>
-
-              <AnimatePresence>
-                {moreOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                    transition={spring.gentle}
-                    className="absolute right-0 bottom-full mb-2 w-48 glass rounded-card shadow-card border border-separator overflow-hidden"
-                  >
-                    <button
-                      onClick={handleDuplicate}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 text-body hover:bg-bg-secondary transition-colors text-left"
-                    >
-                      <Copy className="w-4 h-4 text-text-secondary" />
-                      Duplicate
-                    </button>
-                    {mode === "edit" && (
-                      <button
-                        onClick={handleDelete}
-                        className="w-full flex items-center gap-2 px-3 py-2.5 text-body hover:bg-danger/10 transition-colors text-left text-danger"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </button>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
