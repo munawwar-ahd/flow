@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { addDays, format, isSameDay, isToday, startOfWeek } from "date-fns";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Task, TaskCategory } from "@/types/models";
 import { useTasks } from "@/stores/tasks";
 import { useEvents } from "@/stores/events";
@@ -175,12 +175,16 @@ function DayColumn({
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!onEmptySlotClick) return;
+    // Ignore clicks that landed on an event block (button) — only bare
+    // timeline surface should create a new event.
+    if ((e.target as HTMLElement).closest("button")) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const totalMin = Math.round(((y / HOUR_ROW_PX) * 60) / 15) * 15;
+    // Round down to the clicked hour so tapping anywhere in the 3pm
+    // row lands at 15:00 (spec: "pre-fill start time to the clicked hour").
+    const hoursFromStart = Math.max(0, Math.floor(y / HOUR_ROW_PX));
     const d = new Date(dayStart);
-    d.setHours(startHour, 0, 0, 0);
-    d.setMinutes(d.getMinutes() + totalMin);
+    d.setHours(startHour + hoursFromStart, 0, 0, 0);
     onEmptySlotClick(d.toISOString());
   };
 
@@ -188,7 +192,7 @@ function DayColumn({
     <div
       className="relative"
       style={{ height: totalHeight }}
-      onDoubleClick={handleClick}
+      onClick={handleClick}
     >
       {/* Dashed hour lines */}
       {hours.map((_h, i) => (
@@ -199,26 +203,29 @@ function DayColumn({
         />
       ))}
 
-      {/* Task blocks */}
-      {dayTasks.map((t) => {
-        const start = new Date(t.startAt);
-        const mins = minutesSinceStart(start, startHour);
-        const top = (mins / 60) * HOUR_ROW_PX;
-        const height = Math.max(36, (t.durationMin / 60) * HOUR_ROW_PX);
-        const cat = categories.find((c) => c.id === t.categoryId);
-        return (
-          <EventBlock
-            key={t.id}
-            top={top}
-            height={height}
-            title={t.title}
-            timeLabel={format(start, "HH:mm")}
-            pastel={pastelVar(cat ?? null)}
-            completed={t.completed}
-            onClick={() => onSelectTask(t.id)}
-          />
-        );
-      })}
+      {/* Task blocks — wrapped in AnimatePresence(initial=false) so new
+          items pop in while existing ones don't flicker on week nav. */}
+      <AnimatePresence initial={false}>
+        {dayTasks.map((t) => {
+          const start = new Date(t.startAt);
+          const mins = minutesSinceStart(start, startHour);
+          const top = (mins / 60) * HOUR_ROW_PX;
+          const height = Math.max(36, (t.durationMin / 60) * HOUR_ROW_PX);
+          const cat = categories.find((c) => c.id === t.categoryId);
+          return (
+            <EventBlock
+              key={t.id}
+              top={top}
+              height={height}
+              title={t.title}
+              timeLabel={format(start, "HH:mm")}
+              pastel={pastelVar(cat ?? null)}
+              completed={t.completed}
+              onClick={() => onSelectTask(t.id)}
+            />
+          );
+        })}
+      </AnimatePresence>
 
       {/* External events */}
       {dayEvents.map((e) => {
@@ -263,14 +270,15 @@ function EventBlock({
   return (
     <motion.button
       onClick={onClick}
-      initial={false}
+      initial={{ opacity: 0, scale: 0.94 }}
+      animate={{ opacity: completed ? 0.55 : 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.94 }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.99 }}
       transition={spring.gentle}
       className={cn(
         "absolute left-1 right-1 rounded-xl p-3 text-left overflow-hidden focus-ring",
-        "shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)]",
-        completed && "opacity-60"
+        "shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)]"
       )}
       style={{ top, height, background: pastel }}
     >

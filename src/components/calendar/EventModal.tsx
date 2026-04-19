@@ -41,6 +41,19 @@ function diffMinutes(a: string, b: string) {
   return Math.round((new Date(b).getTime() - new Date(a).getTime()) / 60_000);
 }
 
+// Force the native time/date picker to open on click. Browsers render
+// the inputs natively but only open the picker when the tiny icon is
+// clicked — showPicker() gives us the same result from anywhere on the
+// pill.
+function openPicker(el: HTMLInputElement | null) {
+  if (!el) return;
+  try {
+    el.showPicker?.();
+  } catch {
+    el.focus();
+  }
+}
+
 export function EventModal({ open, mode, initial, onClose }: Props) {
   const categories = useUI((s) => s.categories);
   const add = useTasks((s) => s.add);
@@ -56,7 +69,9 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
   const [moreOpen, setMoreOpen] = useState(false);
   const trapRef = useFocusTrap<HTMLDivElement>(open);
   const titleRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
 
+  // Reset form state whenever the modal opens.
   useEffect(() => {
     if (!open || !initial) return;
     setTitle(initial.title ?? "");
@@ -84,19 +99,25 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
     };
   }, [open, onClose]);
 
-  const selectedCategory = useMemo(
-    () => categories.find((c) => c.id === categoryId) ?? null,
-    [categories, categoryId]
-  );
-
   const reducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
+  // Validation — end must be strictly after start (same day assumed).
+  const timeValid = useMemo(() => {
+    if (!startTime || !endTime || !dateStr) return false;
+    const s = composeIso(dateStr, startTime);
+    const e = composeIso(dateStr, endTime);
+    return new Date(e).getTime() > new Date(s).getTime();
+  }, [startTime, endTime, dateStr]);
+
+  const canSubmit =
+    title.trim().length > 0 && !!categoryId && timeValid && !!dateStr;
+
   const submit = async () => {
-    if (!title.trim() || !dateStr || !startTime) return;
+    if (!canSubmit) return;
     const startIso = composeIso(dateStr, startTime);
-    const endIso = endTime ? composeIso(dateStr, endTime) : addMinutesIso(startIso, 60);
+    const endIso = composeIso(dateStr, endTime);
     const durationMin = Math.max(15, diffMinutes(startIso, endIso));
 
     if (mode === "create") {
@@ -141,6 +162,15 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
     onClose();
   };
 
+  const prettyDate = useMemo(() => {
+    if (!dateStr) return "Pick a date";
+    try {
+      return format(parse(dateStr, "yyyy-MM-dd", new Date()), "EEEE, d MMMM");
+    } catch {
+      return dateStr;
+    }
+  }, [dateStr]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -151,7 +181,11 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
           transition={{ duration: 0.18 }}
           className="fixed inset-0 z-[70] flex items-center justify-center px-4 pt-safe pb-safe"
         >
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-sm" onClick={onClose} />
+          <div
+            className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+            onClick={onClose}
+            aria-hidden
+          />
           <motion.div
             ref={trapRef}
             role="dialog"
@@ -192,20 +226,34 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
             </div>
 
             <div className="space-y-5">
+              {/* Date row — custom pill triggers the native date picker */}
               <Row icon={<CalIcon className="w-4 h-4" />}>
+                <button
+                  type="button"
+                  onClick={() => openPicker(dateRef.current)}
+                  className="text-sm font-semibold text-left hover:text-accent transition-colors focus-ring rounded-md -mx-1 px-1"
+                >
+                  {prettyDate}
+                </button>
                 <input
+                  ref={dateRef}
                   type="date"
                   value={dateStr}
                   onChange={(e) => setDateStr(e.target.value)}
-                  className="text-sm font-semibold bg-transparent focus-ring rounded-md px-1"
                   aria-label="Date"
+                  className="sr-only"
                 />
               </Row>
 
               <Row icon={<Clock className="w-4 h-4" />}>
                 <TimePill value={startTime} onChange={setStartTime} aria="Start time" />
-                <span className="text-text-tertiary text-xs">→</span>
-                <TimePill value={endTime} onChange={setEndTime} aria="End time" />
+                <span className="text-text-tertiary text-xs select-none">→</span>
+                <TimePill
+                  value={endTime}
+                  onChange={setEndTime}
+                  aria="End time"
+                  invalid={startTime.length > 0 && endTime.length > 0 && !timeValid}
+                />
               </Row>
 
               <Row icon={<MapPin className="w-4 h-4" />}>
@@ -225,17 +273,19 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
                     return (
                       <motion.button
                         key={c.id}
+                        type="button"
                         whileTap={tap}
                         transition={spring.snappy}
                         onClick={() => setCategoryId(c.id)}
                         aria-pressed={selected}
                         className={cn(
-                          "px-3 py-1 rounded-full text-[11px] font-bold transition-all",
-                          selected && "ring-2 ring-offset-0"
+                          "px-3 py-1 rounded-full text-[11px] font-bold transition-all focus-ring",
+                          selected ? "opacity-100" : "opacity-55 hover:opacity-85"
                         )}
                         style={{
                           background: pastelVar({ color: c.color, id: c.id }),
                           color: "var(--event-ink)",
+                          boxShadow: selected ? `inset 0 0 0 2px ${c.color}` : undefined,
                         }}
                       >
                         {c.name}
@@ -248,13 +298,15 @@ export function EventModal({ open, mode, initial, onClose }: Props) {
 
             <div className="mt-8 flex gap-3 relative">
               <motion.button
-                whileTap={tap}
+                whileTap={canSubmit ? tap : undefined}
                 transition={spring.snappy}
                 onClick={submit}
-                disabled={!title.trim()}
+                disabled={!canSubmit}
                 className={cn(
-                  "flex-1 py-4 text-sm font-bold rounded-2xl shadow-lg disabled:opacity-40",
-                  "bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] focus-ring"
+                  "flex-1 py-4 text-sm font-bold rounded-2xl transition-opacity focus-ring",
+                  canSubmit
+                    ? "bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] shadow-lg cursor-pointer"
+                    : "bg-[color:var(--today-pill-bg)] text-[color:var(--today-pill-ink)] opacity-35 cursor-not-allowed"
                 )}
               >
                 {mode === "create" ? "Add Event" : "Save Changes"}
@@ -319,25 +371,39 @@ function TimePill({
   value,
   onChange,
   aria,
+  invalid,
 }: {
   value: string;
   onChange: (v: string) => void;
   aria: string;
+  invalid?: boolean;
 }) {
+  const ref = useRef<HTMLInputElement>(null);
   return (
-    <label className="relative inline-flex">
-      <span
-        className="inline-flex items-center px-3 py-1.5 bg-bg-secondary rounded-xl text-[11px] font-bold tabular-nums text-text-primary focus-within:ring-2 focus-within:ring-accent"
+    <>
+      <button
+        type="button"
+        onClick={() => openPicker(ref.current)}
+        aria-label={aria}
+        aria-invalid={invalid || undefined}
+        className={cn(
+          "inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold tabular-nums focus-ring transition-colors",
+          invalid
+            ? "bg-danger/15 text-danger ring-1 ring-danger/40"
+            : "bg-bg-secondary text-text-primary hover:bg-bg-elevated"
+        )}
       >
         {value || "--:--"}
-      </span>
+      </button>
       <input
+        ref={ref}
         type="time"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        aria-label={aria}
-        className="absolute inset-0 opacity-0 cursor-pointer"
+        aria-hidden
+        tabIndex={-1}
+        className="sr-only"
       />
-    </label>
+    </>
   );
 }

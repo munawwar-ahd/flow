@@ -354,7 +354,15 @@ function ContextualPanelContent({
   onAnchorChange: (d: Date) => void;
   onNewEvent: () => void;
 }) {
-  const [miniMonth, setMiniMonth] = useState(anchor);
+  // Mini-month always follows `anchor` — so navigating weeks on the
+  // main grid keeps the highlight (and the surrounding page-of-month)
+  // in sync. Mini chevrons jump to the same day-of-month in the
+  // previous/next month.
+  const onMonthChange = (d: Date) => {
+    const next = new Date(d);
+    next.setDate(anchor.getDate());
+    onAnchorChange(next);
+  };
 
   return (
     <div className="flex flex-col h-full p-6 gap-6 overflow-y-auto flow-scroll">
@@ -370,8 +378,8 @@ function ContextualPanelContent({
       </motion.button>
 
       <MiniMonth
-        month={miniMonth}
-        onMonthChange={setMiniMonth}
+        month={anchor}
+        onMonthChange={onMonthChange}
         selected={anchor}
         onSelect={onAnchorChange}
       />
