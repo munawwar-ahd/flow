@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { MobileTabBar } from "./MobileTabBar";
 import { useUI, applyTheme } from "@/stores/ui";
@@ -19,7 +19,7 @@ import { Onboarding } from "@/components/shared/Onboarding";
 import { FocusModeOverlay } from "@/components/focus/FocusModeOverlay";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { pageVariants, spring } from "@/lib/motion";
+import { spring } from "@/lib/motion";
 
 function useBootstrap() {
   useEffect(() => {
@@ -140,19 +140,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           paddingLeft: isMobile ? 0 : sidebarCollapsed ? 64 : 220,
         }}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={pathname}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={spring.gentle}
-            className="min-h-screen"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
+        <motion.div
+          key={pathname}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={spring.gentle}
+          className="min-h-screen"
+        >
+          {children}
+        </motion.div>
       </main>
       {isMobile && <MobileTabBar />}
       <CommandPalette />
