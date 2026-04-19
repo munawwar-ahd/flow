@@ -1,36 +1,53 @@
 import { create } from "zustand";
-import { db, uid } from "@/lib/db";
+import { db, syncedBulkPut, syncedDelete, syncedPut, uid } from "@/lib/db";
 import type { CalendarEvent } from "@/types/models";
 
 type EventsState = {
   events: CalendarEvent[];
   loaded: boolean;
   load: () => Promise<void>;
-  add: (e: Omit<CalendarEvent, "id"> & { id?: string }) => Promise<CalendarEvent>;
+  add: (e: Omit<CalendarEvent, "id" | "createdAt" | "updatedAt" | "deletedAt"> & { id?: string }) => Promise<CalendarEvent>;
   addMany: (events: CalendarEvent[]) => Promise<void>;
   remove: (id: string) => Promise<void>;
 };
+
+const nowIso = () => new Date().toISOString();
 
 export const useEvents = create<EventsState>((set, get) => ({
   events: [],
   loaded: false,
   load: async () => {
     if (!db) return;
-    const events = await db.events.toArray();
+    const all = await db.events.toArray();
+    const events = all.filter((e) => !e.deletedAt);
     set({ events, loaded: true });
   },
   add: async (e) => {
-    const ev: CalendarEvent = { ...(e as CalendarEvent), id: e.id ?? uid() };
-    await db.events.put(ev);
+    const now = nowIso();
+    const ev: CalendarEvent = {
+      ...(e as Omit<CalendarEvent, "id" | "createdAt" | "updatedAt" | "deletedAt">),
+      id: e.id ?? uid(),
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+    };
+    await syncedPut("event", ev);
     set({ events: [...get().events, ev] });
     return ev;
   },
   addMany: async (events) => {
-    await db.events.bulkPut(events);
-    set({ events: [...get().events, ...events] });
+    const now = nowIso();
+    const stamped = events.map((e) => ({
+      ...e,
+      createdAt: e.createdAt ?? now,
+      updatedAt: e.updatedAt ?? now,
+      deletedAt: e.deletedAt ?? null,
+    }));
+    await syncedBulkPut("event", stamped);
+    set({ events: [...get().events, ...stamped] });
   },
   remove: async (id) => {
-    await db.events.delete(id);
+    await syncedDelete("event", id);
     set({ events: get().events.filter((x) => x.id !== id) });
   },
 }));

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { db, DEFAULT_SETTINGS } from "@/lib/db";
+import { db, DEFAULT_SETTINGS, syncedPut } from "@/lib/db";
 import type { Settings, TaskCategory } from "@/types/models";
 
 type UIState = {
@@ -36,21 +36,34 @@ export const useUI = create<UIState>((set, get) => ({
   activeTaskId: null,
   load: async () => {
     if (!db) return;
-    const [s, cats] = await Promise.all([db.settings.get("singleton"), db.categories.toArray()]);
+    const [s, catsAll] = await Promise.all([db.settings.get("singleton"), db.categories.toArray()]);
+    const cats = catsAll.filter((c) => !c.deletedAt);
     set({
-      settings: s ?? { ...DEFAULT_SETTINGS, id: "singleton" } as any,
+      settings:
+        s && !s.deletedAt
+          ? s
+          : ({ ...DEFAULT_SETTINGS, id: "singleton" } as Settings & { id: "singleton" }),
       categories: cats,
       loaded: true,
     });
   },
   updateSettings: async (patch) => {
-    const next = { ...get().settings, ...patch } as Settings;
-    await db.settings.put({ ...next, id: "singleton" });
+    const now = new Date().toISOString();
+    const next: Settings = { ...get().settings, ...patch, updatedAt: now };
+    if (!next.createdAt) next.createdAt = now;
+    await syncedPut("settings", { ...next, id: "singleton" } as Settings & { id: "singleton" });
     set({ settings: next });
   },
   addCategory: async (c) => {
-    await db.categories.put(c);
-    set({ categories: [...get().categories, c] });
+    const now = new Date().toISOString();
+    const stamped: TaskCategory = {
+      ...c,
+      createdAt: c.createdAt ?? now,
+      updatedAt: now,
+      deletedAt: c.deletedAt ?? null,
+    };
+    await syncedPut("category", stamped);
+    set({ categories: [...get().categories, stamped] });
   },
   setTheme: async (theme) => {
     await get().updateSettings({ theme });

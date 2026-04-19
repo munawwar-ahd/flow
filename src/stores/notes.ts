@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { db, uid } from "@/lib/db";
+import { db, syncedDelete, syncedPut, uid } from "@/lib/db";
 import type { Note } from "@/types/models";
 
 type NotesState = {
@@ -19,20 +19,23 @@ export const useNotes = create<NotesState>((set, get) => ({
   loaded: false,
   load: async () => {
     if (!db) return;
-    const notes = await db.notes.toArray();
+    const all = await db.notes.toArray();
+    const notes = all.filter((n) => !n.deletedAt);
     notes.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     set({ notes, loaded: true });
   },
   add: async (partial) => {
+    const now = nowIso();
     const n: Note = {
       id: uid(),
       title: partial?.title ?? "New Note",
       content: partial?.content ?? "",
       linkedTaskIds: partial?.linkedTaskIds ?? [],
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
     };
-    await db.notes.put(n);
+    await syncedPut("note", n);
     set({ notes: [n, ...get().notes] });
     return n;
   },
@@ -40,13 +43,13 @@ export const useNotes = create<NotesState>((set, get) => ({
     const n = get().notes.find((x) => x.id === id);
     if (!n) return;
     const next = { ...n, ...patch, updatedAt: nowIso() };
-    await db.notes.put(next);
+    await syncedPut("note", next);
     const notes = get().notes.map((x) => (x.id === id ? next : x));
     notes.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     set({ notes });
   },
   remove: async (id) => {
-    await db.notes.delete(id);
+    await syncedDelete("note", id);
     set({ notes: get().notes.filter((x) => x.id !== id) });
   },
   linkTask: async (noteId, taskId) => {
@@ -54,7 +57,7 @@ export const useNotes = create<NotesState>((set, get) => ({
     if (!n) return;
     if (n.linkedTaskIds.includes(taskId)) return;
     const next = { ...n, linkedTaskIds: [...n.linkedTaskIds, taskId], updatedAt: nowIso() };
-    await db.notes.put(next);
+    await syncedPut("note", next);
     set({ notes: get().notes.map((x) => (x.id === noteId ? next : x)) });
   },
 }));

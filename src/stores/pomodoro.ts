@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { db, uid } from "@/lib/db";
+import { db, syncedPut, uid } from "@/lib/db";
 import type { PomodoroSession } from "@/types/models";
 
 type PomKind = "work" | "short-break" | "long-break";
@@ -38,8 +38,8 @@ export const usePomodoro = create<PomState>((set, get) => ({
   sessions: [],
   loadSessions: async () => {
     if (!db) return;
-    const sessions = await db.sessions.toArray();
-    set({ sessions });
+    const all = await db.sessions.toArray();
+    set({ sessions: all.filter((s) => !s.deletedAt) });
   },
   setLinkedTask: (id) => set({ linkedTaskId: id }),
   setFocusMode: (on) => set({ focusMode: on }),
@@ -82,6 +82,7 @@ export const usePomodoro = create<PomState>((set, get) => ({
   },
   completeSession: async () => {
     const { kind, totalMs, linkedTaskId, cyclesCompleted } = get();
+    const now = new Date().toISOString();
     const session: PomodoroSession = {
       id: uid(),
       taskId: linkedTaskId ?? undefined,
@@ -89,8 +90,11 @@ export const usePomodoro = create<PomState>((set, get) => ({
       durationMin: Math.round(totalMs / 60000),
       completed: true,
       kind,
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
     };
-    if (db) await db.sessions.put(session);
+    await syncedPut("session", session);
     set({ sessions: [...get().sessions, session] });
 
     if (kind === "work") {

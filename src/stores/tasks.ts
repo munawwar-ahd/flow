@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { db, uid } from "@/lib/db";
+import { db, syncedDelete, syncedPut, uid } from "@/lib/db";
 import type { Task } from "@/types/models";
 
 type TasksState = {
@@ -19,10 +19,12 @@ export const useTasks = create<TasksState>((set, get) => ({
   loaded: false,
   load: async () => {
     if (!db) return;
-    const tasks = await db.tasks.toArray();
+    const all = await db.tasks.toArray();
+    const tasks = all.filter((t) => !t.deletedAt);
     set({ tasks, loaded: true });
   },
   add: async (partial) => {
+    const now = nowIso();
     const t: Task = {
       id: uid(),
       title: partial.title,
@@ -35,10 +37,11 @@ export const useTasks = create<TasksState>((set, get) => ({
       subtasks: partial.subtasks ?? [],
       reminderMin: partial.reminderMin,
       recurrence: partial.recurrence,
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
     };
-    await db.tasks.put(t);
+    await syncedPut("task", t);
     set({ tasks: [...get().tasks, t] });
     return t;
   },
@@ -46,11 +49,11 @@ export const useTasks = create<TasksState>((set, get) => ({
     const t = get().tasks.find((x) => x.id === id);
     if (!t) return;
     const next = { ...t, ...patch, updatedAt: nowIso() };
-    await db.tasks.put(next);
+    await syncedPut("task", next);
     set({ tasks: get().tasks.map((x) => (x.id === id ? next : x)) });
   },
   remove: async (id) => {
-    await db.tasks.delete(id);
+    await syncedDelete("task", id);
     set({ tasks: get().tasks.filter((x) => x.id !== id) });
   },
   toggle: async (id) => {
@@ -63,7 +66,7 @@ export const useTasks = create<TasksState>((set, get) => ({
       completedAt: completed ? nowIso() : undefined,
       updatedAt: nowIso(),
     };
-    await db.tasks.put(next);
+    await syncedPut("task", next);
     set({ tasks: get().tasks.map((x) => (x.id === id ? next : x)) });
   },
 }));

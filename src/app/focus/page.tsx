@@ -5,6 +5,7 @@ import { PomodoroRing } from "@/components/focus/PomodoroRing";
 import { Button } from "@/components/shared/Button";
 import { SegmentedControl } from "@/components/shared/SegmentedControl";
 import { UserMenu } from "@/components/shared/UserMenu";
+import { SyncIndicator } from "@/components/shared/SyncIndicator";
 import { usePomodoro } from "@/stores/pomodoro";
 import { useTasks } from "@/stores/tasks";
 import { useUI } from "@/stores/ui";
@@ -94,6 +95,7 @@ export default function FocusPage() {
               ]}
               size="sm"
             />
+            <SyncIndicator variant="compact" className="md:hidden" />
             <UserMenu variant="compact" className="md:hidden" />
           </div>
         </div>

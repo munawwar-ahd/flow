@@ -9,7 +9,10 @@ import { useTasks } from "@/stores/tasks";
 import { useNotes } from "@/stores/notes";
 import { useEvents } from "@/stores/events";
 import { usePomodoro } from "@/stores/pomodoro";
-import { db, DEFAULT_CATEGORIES, DEFAULT_SETTINGS, uid } from "@/lib/db";
+import { useSync } from "@/stores/sync";
+import { useAuthStore } from "@/stores/auth";
+import { db, DEFAULT_CATEGORIES, DEFAULT_SETTINGS, syncedBulkPut, syncedPut, uid } from "@/lib/db";
+import type { Task, TaskCategory } from "@/types/models";
 import { CommandPalette } from "@/components/shared/CommandPalette";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { SettingsModal } from "@/components/shared/SettingsModal";
@@ -17,25 +20,44 @@ import { TaskEditor } from "@/components/shared/TaskEditor";
 import { TaskDetailSheet } from "@/components/timeline/TaskDetailSheet";
 import { Onboarding } from "@/components/shared/Onboarding";
 import { FocusModeOverlay } from "@/components/focus/FocusModeOverlay";
+import { SyncOverlay } from "@/components/shared/SyncOverlay";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useAuth } from "@/hooks/useAuth";
+import { useSyncLifecycle } from "@/hooks/useSync";
 import { spring } from "@/lib/motion";
 
 function useBootstrap() {
+  const userId = useAuthStore((s) => s.user?.id ?? null);
+  const authLoading = useAuthStore((s) => s.loading);
+  const initialPullComplete = useSync((s) => s.initialPullComplete);
+
   useEffect(() => {
     let cancelled = false;
+    if (!db) return;
+    // Don't seed while auth is still resolving (avoids seeding as unauth,
+    // then syncing as authed and duplicating). If authed, wait for the
+    // initial pull so cloud data has priority over local defaults.
+    if (authLoading) return;
+    if (userId && !initialPullComplete) return;
+
     (async () => {
-      if (!db) return;
+      const nowIso = () => new Date().toISOString();
 
       const settings = await db.settings.get("singleton");
       if (!settings) {
-        await db.settings.put({ ...DEFAULT_SETTINGS, id: "singleton" });
+        await syncedPut("settings", {
+          ...DEFAULT_SETTINGS,
+          id: "singleton",
+          createdAt: nowIso(),
+          updatedAt: nowIso(),
+        });
       }
 
       const catCount = await db.categories.count();
       if (catCount === 0) {
-        await db.categories.bulkPut(DEFAULT_CATEGORIES);
+        const cats: TaskCategory[] = DEFAULT_CATEGORIES.map((c) => ({ ...c }));
+        await syncedBulkPut("category", cats);
       }
 
       await Promise.all([
@@ -57,7 +79,8 @@ function useBootstrap() {
           d.setHours(h, m, 0, 0);
           return d.toISOString();
         };
-        const seed = [
+        const nowIsoSeed = nowIso();
+        const seed: Task[] = [
           {
             id: uid(),
             title: "Morning planning",
@@ -66,8 +89,9 @@ function useBootstrap() {
             durationMin: 30,
             completed: false,
             subtasks: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: nowIsoSeed,
+            updatedAt: nowIsoSeed,
+            deletedAt: null,
           },
           {
             id: uid(),
@@ -77,8 +101,9 @@ function useBootstrap() {
             durationMin: 90,
             completed: false,
             subtasks: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: nowIsoSeed,
+            updatedAt: nowIsoSeed,
+            deletedAt: null,
           },
           {
             id: uid(),
@@ -88,11 +113,12 @@ function useBootstrap() {
             durationMin: 45,
             completed: false,
             subtasks: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: nowIsoSeed,
+            updatedAt: nowIsoSeed,
+            deletedAt: null,
           },
         ];
-        await db.tasks.bulkPut(seed as any);
+        await syncedBulkPut("task", seed);
         if (!cancelled) await useTasks.getState().load();
       }
     })();
@@ -106,11 +132,12 @@ function useBootstrap() {
       cancelled = true;
       mq.removeEventListener("change", onSys);
     };
-  }, []);
+  }, [userId, authLoading, initialPullComplete]);
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   useAuth();
+  useSyncLifecycle();
   useBootstrap();
   useKeyboardShortcuts();
   const pathname = usePathname();
@@ -160,6 +187,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <TaskEditor />
       <TaskDetailSheet />
       <FocusModeOverlay />
+      <SyncOverlay />
       {!onboarded && <Onboarding />}
     </div>
   );

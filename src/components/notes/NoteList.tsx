@@ -6,6 +6,7 @@ import { useNotes } from "@/stores/notes";
 import { cn } from "@/lib/cn";
 import { spring } from "@/lib/motion";
 import { UserMenu } from "@/components/shared/UserMenu";
+import { SyncIndicator } from "@/components/shared/SyncIndicator";
 
 export function NoteList({
   activeId,
@@ -37,6 +38,7 @@ export function NoteList({
           >
             <Plus className="w-4 h-4" />
           </button>
+          <SyncIndicator variant="compact" className="md:hidden" />
           <UserMenu variant="compact" className="md:hidden" />
         </div>
       </div>

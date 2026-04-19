@@ -2,6 +2,9 @@ export type TaskCategory = {
   id: string;
   name: string;
   color: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export type Subtask = { id: string; title: string; done: boolean };
@@ -27,6 +30,7 @@ export type Task = {
   recurrence?: Recurrence;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export type Note = {
@@ -36,6 +40,7 @@ export type Note = {
   linkedTaskIds: string[];
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export type CalendarEvent = {
@@ -47,6 +52,9 @@ export type CalendarEvent = {
   endAt: string;
   allDay: boolean;
   description?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export type PomodoroSession = {
@@ -56,6 +64,9 @@ export type PomodoroSession = {
   durationMin: number;
   completed: boolean;
   kind: "work" | "short-break" | "long-break";
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export type Settings = {
@@ -74,6 +85,9 @@ export type Settings = {
   weekStartsOn: 0 | 1;
   userName?: string;
   onboarded?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
 };
 
 export const CATEGORY_COLORS = [
@@ -86,3 +100,15 @@ export const CATEGORY_COLORS = [
   "#BF5AF2",
   "#FF375F",
 ];
+
+export type SyncEntity = "task" | "note" | "event" | "session" | "category" | "settings";
+export type SyncOperation = "upsert" | "delete";
+
+export type SyncQueueItem = {
+  id?: number;
+  entity: SyncEntity;
+  operation: SyncOperation;
+  recordId: string;
+  userId: string;
+  createdAt: string;
+};
