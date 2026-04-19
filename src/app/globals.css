@@ -17,6 +17,26 @@
   --danger: #FF3B30;
   --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(0, 0, 0, 0.06);
+
+  /* Calendar event pastel palette */
+  --event-1: #D4E8F7;  /* baby blue  */
+  --event-2: #D4F4DD;  /* mint       */
+  --event-3: #FFF3C4;  /* soft yellow*/
+  --event-4: #FFD9C4;  /* peach      */
+  --event-5: #E4D4F7;  /* lavender   */
+  --event-6: #FADCE5;  /* rose pink  */
+  --event-7: #F5F1E8;  /* cream      */
+  --event-8: #FFE8B2;  /* butter     */
+  --event-ink: #1D1D1F;
+  --event-ink-soft: rgba(29, 29, 31, 0.55);
+
+  /* Surface for the calendar contextual panel */
+  --bg-sidebar-soft: #FAFAFA;
+
+  /* "Today" pill on weekday header */
+  --today-pill-bg: #1C1C1E;
+  --today-pill-ink: #FFFFFF;
+  --today-pill-shadow: 0 8px 18px rgba(28, 28, 30, 0.22);
 }
 
 .dark {
@@ -34,6 +54,23 @@
   --danger: #FF453A;
   --glass-bg: rgba(28, 28, 30, 0.72);
   --glass-border: rgba(255, 255, 255, 0.08);
+
+  --event-1: rgba(100, 210, 255, 0.18);
+  --event-2: rgba(48, 209, 88, 0.18);
+  --event-3: rgba(255, 214, 10, 0.14);
+  --event-4: rgba(255, 159, 10, 0.18);
+  --event-5: rgba(191, 90, 242, 0.18);
+  --event-6: rgba(255, 55, 95, 0.16);
+  --event-7: rgba(174, 174, 178, 0.14);
+  --event-8: rgba(255, 204, 77, 0.18);
+  --event-ink: #F5F5F7;
+  --event-ink-soft: rgba(245, 245, 247, 0.6);
+
+  --bg-sidebar-soft: #1C1C1E;
+
+  --today-pill-bg: #F5F5F7;
+  --today-pill-ink: #1C1C1E;
+  --today-pill-shadow: 0 8px 18px rgba(245, 245, 247, 0.12);
 }
 
 * {

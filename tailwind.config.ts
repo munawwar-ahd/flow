@@ -24,6 +24,22 @@ const config: Config = {
         success: "var(--success)",
         warning: "var(--warning)",
         danger: "var(--danger)",
+        event: {
+          1: "var(--event-1)",
+          2: "var(--event-2)",
+          3: "var(--event-3)",
+          4: "var(--event-4)",
+          5: "var(--event-5)",
+          6: "var(--event-6)",
+          7: "var(--event-7)",
+          8: "var(--event-8)",
+          ink: "var(--event-ink)",
+        },
+        "sidebar-soft": "var(--bg-sidebar-soft)",
+        "today-pill": {
+          bg: "var(--today-pill-bg)",
+          ink: "var(--today-pill-ink)",
+        },
       },
       fontFamily: {
         sans: [
