@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronLeft } from "lucide-react";
 import { NoteList } from "@/components/notes/NoteList";
 import { NoteEditor } from "@/components/notes/NoteEditor";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { useNotes } from "@/stores/notes";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { spring } from "@/lib/motion";
@@ -74,15 +75,18 @@ function NotesInner() {
             className="flex-1 flex flex-col min-w-0"
           >
             {isMobile && activeId && (
-              <button
-                onClick={() => {
-                  setActiveId(null);
-                  router.replace("/notes");
-                }}
-                className="flex items-center gap-1 text-accent px-4 py-3 text-body"
-              >
-                <ChevronLeft className="w-4 h-4" /> Notes
-              </button>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-separator">
+                <button
+                  onClick={() => {
+                    setActiveId(null);
+                    router.replace("/notes");
+                  }}
+                  className="flex items-center gap-1 text-accent text-body"
+                >
+                  <ChevronLeft className="w-4 h-4" /> Notes
+                </button>
+                <UserMenu variant="compact" />
+              </div>
             )}
             {activeId ? (
               <NoteEditor id={activeId} />

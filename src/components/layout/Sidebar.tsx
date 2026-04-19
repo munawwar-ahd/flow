@@ -6,6 +6,7 @@ import { Calendar, FileText, Home, Timer, Settings as Cog, ChevronsLeft, Chevron
 import { useUI } from "@/stores/ui";
 import { spring } from "@/lib/motion";
 import { cn } from "@/lib/cn";
+import { UserMenu } from "@/components/shared/UserMenu";
 
 const items = [
   { href: "/", label: "Today", icon: Home },
@@ -70,6 +71,10 @@ export function Sidebar() {
       </nav>
 
       <div className="p-2 space-y-0.5">
+        <div className={cn("mb-1", collapsed ? "px-0" : "px-0")}>
+          <UserMenu variant="sidebar" collapsed={collapsed} />
+        </div>
+        <div className="h-px bg-separator mx-2 mb-1" />
         <button
           onClick={() => setCommand(true)}
           className={cn(

@@ -19,6 +19,7 @@ import { Onboarding } from "@/components/shared/Onboarding";
 import { FocusModeOverlay } from "@/components/focus/FocusModeOverlay";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useAuth } from "@/hooks/useAuth";
 import { spring } from "@/lib/motion";
 
 function useBootstrap() {
@@ -109,6 +110,7 @@ function useBootstrap() {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  useAuth();
   useBootstrap();
   useKeyboardShortcuts();
   const pathname = usePathname();
@@ -117,6 +119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const sidebarCollapsed = useUI((s) => s.sidebarCollapsed);
   const onboarded = settings.onboarded;
   const isWidget = pathname?.startsWith("/widget");
+  const isAuthRoute = pathname === "/login" || pathname?.startsWith("/auth/");
 
   useEffect(() => {
     try {
@@ -124,7 +127,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [settings.theme]);
 
-  if (isWidget) {
+  if (isWidget || isAuthRoute) {
     return <>{children}</>;
   }
 

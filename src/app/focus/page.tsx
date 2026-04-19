@@ -4,6 +4,7 @@ import { ChevronDown, Pause, Play, RotateCcw, Maximize2, Volume2, VolumeX } from
 import { PomodoroRing } from "@/components/focus/PomodoroRing";
 import { Button } from "@/components/shared/Button";
 import { SegmentedControl } from "@/components/shared/SegmentedControl";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { usePomodoro } from "@/stores/pomodoro";
 import { useTasks } from "@/stores/tasks";
 import { useUI } from "@/stores/ui";
@@ -93,6 +94,7 @@ export default function FocusPage() {
               ]}
               size="sm"
             />
+            <UserMenu variant="compact" className="md:hidden" />
           </div>
         </div>
       </header>

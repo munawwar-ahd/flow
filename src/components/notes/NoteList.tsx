@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { useNotes } from "@/stores/notes";
 import { cn } from "@/lib/cn";
 import { spring } from "@/lib/motion";
+import { UserMenu } from "@/components/shared/UserMenu";
 
 export function NoteList({
   activeId,
@@ -26,15 +27,18 @@ export function NoteList({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="px-4 py-3 flex items-center justify-between border-b border-separator">
+      <div className="px-4 py-3 flex items-center justify-between gap-2 border-b border-separator">
         <h2 className="text-headline">Notes</h2>
-        <button
-          onClick={onCreate}
-          aria-label="New note"
-          className="w-8 h-8 rounded-full hover:bg-bg-elevated text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onCreate}
+            aria-label="New note"
+            className="w-8 h-8 rounded-full hover:bg-bg-elevated text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <UserMenu variant="compact" className="md:hidden" />
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto flow-scroll">
         {filtered.length === 0 && (

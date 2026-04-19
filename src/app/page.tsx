@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Plus, Minus, ZoomIn } from "lucide-react";
 import { Timeline } from "@/components/timeline/Timeline";
 import { Button } from "@/components/shared/Button";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { useUI } from "@/stores/ui";
 import { useTasks } from "@/stores/tasks";
 import { spring } from "@/lib/motion";
@@ -116,6 +117,7 @@ export default function TodayPage() {
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">New</span>
             </Button>
+            <UserMenu variant="compact" className="md:hidden" />
           </div>
         </div>
       </header>

@@ -6,6 +6,7 @@ import { MonthView } from "@/components/calendar/MonthView";
 import { WeekView } from "@/components/calendar/WeekView";
 import { SegmentedControl } from "@/components/shared/SegmentedControl";
 import { Button } from "@/components/shared/Button";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { useEvents } from "@/stores/events";
 import { parseICS } from "@/lib/ics";
 
@@ -79,6 +80,7 @@ export default function CalendarPage() {
               className="hidden"
               onChange={(e) => e.target.files?.[0] && onImport(e.target.files[0])}
             />
+            <UserMenu variant="compact" className="md:hidden" />
           </div>
         </div>
       </header>
