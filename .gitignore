@@ -1,0 +1,17 @@
+node_modules
+.next
+tsconfig.tsbuildinfo
+out
+dist
+.env*
+!.env.example
+.DS_Store
+*.log
+.vercel
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/worker-*.js
+public/worker-*.js.map
+public/fallback-*.js

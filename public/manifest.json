@@ -1,0 +1,13 @@
+{
+  "name": "Flow — Time Management",
+  "short_name": "Flow",
+  "description": "Your day, at a glance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FBFBFD",
+  "theme_color": "#007AFF",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
