@@ -73,7 +73,12 @@ export function NoteEditor({ id }: { id: string }) {
   if (!note) {
     return (
       <div className="flex-1 flex items-center justify-center text-text-tertiary">
-        Select a note or create one.
+        <div className="text-center">
+          <div className="text-body">Select a note or create one.</div>
+          <div className="text-caption text-text-tertiary/70 mt-1">
+            Press ⌘⇧N to start a new one
+          </div>
+        </div>
       </div>
     );
   }
@@ -123,25 +128,31 @@ export function NoteEditor({ id }: { id: string }) {
   return (
     <motion.div
       key={id}
-      initial={{ opacity: 0, x: 12 }}
+      initial={{ opacity: 0, x: 8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={spring.gentle}
       className="flex-1 flex flex-col h-full"
     >
-      <div className="flex items-center justify-between px-6 md:px-10 pt-6 pb-2">
-        <input
-          value={title}
-          placeholder="Untitled"
-          onChange={(e) => setTitle(e.target.value)}
-          onBlur={commit}
-          className="flex-1 bg-transparent text-display focus:outline-none placeholder:text-text-tertiary"
-        />
+      <div className="px-8 md:px-12 pt-8 pb-3 flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <input
+            value={title}
+            placeholder="Untitled"
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={commit}
+            className="w-full bg-transparent text-display focus:outline-none placeholder:text-text-tertiary"
+            style={{ letterSpacing: "-0.5px" }}
+          />
+          <div className="text-caption text-text-tertiary mt-1">
+            Updated {new Date(note.updatedAt).toLocaleString()}
+          </div>
+        </div>
         <button
           onClick={() => {
             if (confirm("Delete this note?")) remove(id);
           }}
           aria-label="Delete note"
-          className="w-9 h-9 rounded-full hover:bg-danger/10 hover:text-danger text-text-tertiary flex items-center justify-center"
+          className="w-9 h-9 rounded-full hover:bg-danger/10 hover:text-danger text-text-tertiary flex items-center justify-center focus-ring cursor-pointer transition-colors shrink-0 mt-2"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -155,11 +166,11 @@ export function NoteEditor({ id }: { id: string }) {
             onChange={(e) => onContentChange(e.target.value)}
             onBlur={commit}
             placeholder={"Start writing...\n\nTry: # heading, - bullet, [] todo, @task to link"}
-            className="h-full resize-none bg-transparent px-6 md:px-10 py-4 text-body leading-relaxed focus:outline-none flow-scroll border-r border-separator/50 placeholder:text-text-tertiary"
+            className="h-full resize-none bg-transparent px-8 md:px-12 py-4 text-body leading-relaxed focus:outline-none flow-scroll border-r border-separator/50 placeholder:text-text-tertiary"
           />
           <div
             className={cn(
-              "hidden md:block h-full overflow-y-auto flow-scroll px-10 py-4 prose-flow"
+              "hidden md:block h-full overflow-y-auto flow-scroll px-12 py-4 prose-flow"
             )}
             dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
           />

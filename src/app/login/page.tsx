@@ -48,12 +48,24 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-primary px-4 pt-safe pb-safe">
+    <div className="relative min-h-screen flex items-center justify-center bg-bg-primary px-4 pt-safe pb-safe overflow-hidden">
+      {/* Ambient pastel blur in one corner — pulled way back so it's decor, not a feature */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 -left-24 w-[380px] h-[380px] rounded-full blur-3xl opacity-60"
+        style={{ background: "var(--event-5)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 -right-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-50"
+        style={{ background: "var(--event-1)" }}
+      />
+
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={spring.gentle}
-        className="w-full max-w-[400px] rounded-3xl p-10 border border-separator shadow-card backdrop-blur-3xl backdrop-saturate-150"
+        className="relative w-full max-w-[400px] rounded-3xl p-10 border border-separator/70 shadow-2xl backdrop-blur-3xl backdrop-saturate-150"
         style={{ background: "var(--glass-bg)" }}
       >
         <motion.h1

@@ -65,10 +65,10 @@ export function Modal({ open, onClose, title, children, widthClass, asSheetOnMob
               if (info.offset.y > 120) onClose();
             }}
             className={cn(
-              "relative bg-bg-elevated text-text-primary shadow-card",
+              "relative bg-bg-elevated text-text-primary shadow-2xl border border-separator/60",
               asSheet
-                ? "w-full rounded-t-modal max-h-[90vh] overflow-hidden pb-safe"
-                : cn("rounded-modal max-h-[85vh] overflow-hidden", widthClass ?? "w-[min(92vw,540px)]")
+                ? "w-full rounded-t-3xl max-h-[90vh] overflow-hidden pb-safe"
+                : cn("rounded-3xl max-h-[85vh] overflow-hidden", widthClass ?? "w-[min(92vw,540px)]")
             )}
           >
             {asSheet && (
@@ -77,18 +77,18 @@ export function Modal({ open, onClose, title, children, widthClass, asSheetOnMob
               </div>
             )}
             {!hideHeader && (title || !asSheet) && (
-              <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                <h2 className="text-headline">{title}</h2>
+              <div className="flex items-center justify-between px-6 pt-5 pb-2">
+                <h2 className="text-title" style={{ letterSpacing: "-0.3px" }}>{title}</h2>
                 <button
                   onClick={onClose}
                   aria-label="Close"
-                  className="w-8 h-8 rounded-full bg-bg-secondary hover:bg-bg-primary flex items-center justify-center focus-ring transition-colors"
+                  className="w-9 h-9 rounded-full bg-bg-secondary hover:bg-bg-primary flex items-center justify-center focus-ring cursor-pointer transition-colors"
                 >
                   <X className="w-4 h-4 text-text-secondary" />
                 </button>
               </div>
             )}
-            <div className="px-5 pb-5 overflow-y-auto flow-scroll max-h-[calc(85vh-64px)]">
+            <div className="px-6 pb-6 overflow-y-auto flow-scroll max-h-[calc(85vh-72px)]">
               {children}
             </div>
           </motion.div>

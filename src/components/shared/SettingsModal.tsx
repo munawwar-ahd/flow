@@ -1,13 +1,14 @@
 "use client";
+import { motion } from "framer-motion";
 import { Download, FileText, Moon, Sun, SunMoon } from "lucide-react";
 import { Modal } from "./Modal";
-import { Button } from "./Button";
 import { SegmentedControl } from "./SegmentedControl";
 import { useUI } from "@/stores/ui";
 import { useTasks } from "@/stores/tasks";
 import { useNotes } from "@/stores/notes";
 import { usePomodoro } from "@/stores/pomodoro";
 import { cn } from "@/lib/cn";
+import { spring, tap } from "@/lib/motion";
 
 export function SettingsModal() {
   const open = useUI((s) => s.settingsOpen);
@@ -50,43 +51,43 @@ export function SettingsModal() {
 
   const workMins = [15, 20, 25, 30, 45, 50];
 
+  const workSessions = sessions.filter((s) => s.kind === "work");
+  const focusMinutes = workSessions.reduce((a, s) => a + s.durationMin, 0);
+  const completedTasks = tasks.filter((t) => t.completed).length;
+
   return (
-    <Modal open={open} onClose={() => setOpen(false)} title="Settings" widthClass="w-[min(92vw,600px)]">
+    <Modal
+      open={open}
+      onClose={() => setOpen(false)}
+      title="Settings"
+      widthClass="w-[min(92vw,560px)]"
+    >
       <div className="space-y-6">
         <Section label="Appearance">
           <div className="flex items-center gap-2">
             {(["light", "system", "dark"] as const).map((v) => (
-              <button
+              <motion.button
                 key={v}
+                whileTap={tap}
+                transition={spring.snappy}
                 onClick={() => setTheme(v)}
                 className={cn(
-                  "flex-1 h-12 rounded-btn border flex items-center justify-center gap-2 text-body transition-colors",
+                  "flex-1 h-12 rounded-xl border flex items-center justify-center gap-2 text-body transition-colors focus-ring cursor-pointer",
                   settings.theme === v
-                    ? "bg-accent-soft border-accent text-accent"
-                    : "bg-bg-secondary border-separator text-text-secondary hover:text-text-primary"
+                    ? "bg-accent-soft border-accent text-accent font-medium"
+                    : "bg-bg-secondary border-separator/70 text-text-secondary hover:text-text-primary"
                 )}
               >
-                {v === "light" ? <Sun className="w-4 h-4" /> : v === "dark" ? <Moon className="w-4 h-4" /> : <SunMoon className="w-4 h-4" />}
+                {v === "light" ? (
+                  <Sun className="w-4 h-4" />
+                ) : v === "dark" ? (
+                  <Moon className="w-4 h-4" />
+                ) : (
+                  <SunMoon className="w-4 h-4" />
+                )}
                 {v[0].toUpperCase() + v.slice(1)}
-              </button>
+              </motion.button>
             ))}
-          </div>
-        </Section>
-
-        <Section label="Timeline hour height">
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min={30}
-              max={120}
-              step={5}
-              value={settings.timelineHourHeight}
-              onChange={(e) => update({ timelineHourHeight: Number(e.target.value) })}
-              className="flex-1 accent-accent"
-            />
-            <span className="text-caption text-text-secondary tabular-nums w-14 text-right">
-              {settings.timelineHourHeight}px
-            </span>
           </div>
         </Section>
 
@@ -105,27 +106,33 @@ export function SettingsModal() {
         <Section label="Pomodoro">
           <div className="space-y-3">
             <Row label="Work (min)">
-              <div className="flex gap-1.5 flex-wrap">
+              <div className="flex gap-1.5 flex-wrap justify-end">
                 {workMins.map((m) => (
-                  <button
+                  <motion.button
                     key={m}
-                    onClick={() => update({ pomodoro: { ...settings.pomodoro, workMin: m } })}
+                    whileTap={tap}
+                    transition={spring.snappy}
+                    onClick={() =>
+                      update({ pomodoro: { ...settings.pomodoro, workMin: m } })
+                    }
                     className={cn(
-                      "h-8 px-3 rounded-chip text-caption border",
+                      "h-8 px-3 rounded-full text-caption font-medium border transition-colors focus-ring cursor-pointer",
                       settings.pomodoro.workMin === m
                         ? "bg-accent text-white border-accent"
-                        : "bg-bg-secondary border-separator text-text-secondary"
+                        : "bg-bg-secondary border-separator/70 text-text-secondary hover:text-text-primary"
                     )}
                   >
                     {m}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </Row>
             <Row label="Short break (min)">
               <NumberStepper
                 value={settings.pomodoro.shortBreakMin}
-                onChange={(v) => update({ pomodoro: { ...settings.pomodoro, shortBreakMin: v } })}
+                onChange={(v) =>
+                  update({ pomodoro: { ...settings.pomodoro, shortBreakMin: v } })
+                }
                 min={1}
                 max={30}
               />
@@ -133,7 +140,9 @@ export function SettingsModal() {
             <Row label="Long break (min)">
               <NumberStepper
                 value={settings.pomodoro.longBreakMin}
-                onChange={(v) => update({ pomodoro: { ...settings.pomodoro, longBreakMin: v } })}
+                onChange={(v) =>
+                  update({ pomodoro: { ...settings.pomodoro, longBreakMin: v } })
+                }
                 min={5}
                 max={60}
               />
@@ -141,7 +150,11 @@ export function SettingsModal() {
             <Row label="Cycles before long break">
               <NumberStepper
                 value={settings.pomodoro.cyclesBeforeLongBreak}
-                onChange={(v) => update({ pomodoro: { ...settings.pomodoro, cyclesBeforeLongBreak: v } })}
+                onChange={(v) =>
+                  update({
+                    pomodoro: { ...settings.pomodoro, cyclesBeforeLongBreak: v },
+                  })
+                }
                 min={2}
                 max={8}
               />
@@ -149,40 +162,28 @@ export function SettingsModal() {
           </div>
         </Section>
 
-        <Section label="Export">
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => doExportPDF("today")}>
-              <Download className="w-4 h-4" /> Today PDF
-            </Button>
-            <Button onClick={() => doExportPDF("week")}>
-              <Download className="w-4 h-4" /> Week PDF
-            </Button>
-            <Button onClick={() => doExportPDF("all")}>
-              <Download className="w-4 h-4" /> All PDF
-            </Button>
-            <Button onClick={doExportCSV}>
-              <FileText className="w-4 h-4" /> CSVs
-            </Button>
+        <Section label="Focus stats">
+          <div className="grid grid-cols-3 gap-3">
+            <Stat label="Sessions" value={workSessions.length.toString()} pastel="var(--event-1)" />
+            <Stat label="Minutes" value={focusMinutes.toString()} pastel="var(--event-2)" />
+            <Stat label="Done" value={completedTasks.toString()} pastel="var(--event-5)" />
           </div>
         </Section>
 
-        <Section label="Focus stats">
-          <div className="grid grid-cols-3 gap-2">
-            <Stat
-              label="Sessions"
-              value={sessions.filter((s) => s.kind === "work").length.toString()}
-            />
-            <Stat
-              label="Minutes"
-              value={sessions
-                .filter((s) => s.kind === "work")
-                .reduce((a, s) => a + s.durationMin, 0)
-                .toString()}
-            />
-            <Stat
-              label="Completed tasks"
-              value={tasks.filter((t) => t.completed).length.toString()}
-            />
+        <Section label="Data">
+          <div className="flex flex-wrap gap-2">
+            <ExportButton onClick={() => doExportPDF("today")}>
+              <Download className="w-4 h-4" /> Today PDF
+            </ExportButton>
+            <ExportButton onClick={() => doExportPDF("week")}>
+              <Download className="w-4 h-4" /> Week PDF
+            </ExportButton>
+            <ExportButton onClick={() => doExportPDF("all")}>
+              <Download className="w-4 h-4" /> All PDF
+            </ExportButton>
+            <ExportButton onClick={doExportCSV}>
+              <FileText className="w-4 h-4" /> CSVs
+            </ExportButton>
           </div>
         </Section>
       </div>
@@ -190,16 +191,32 @@ export function SettingsModal() {
   );
 }
 
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
+function Section({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <div className="text-micro uppercase tracking-wide text-text-tertiary mb-2">{label}</div>
-      {children}
+      <div className="text-micro uppercase tracking-wide text-text-tertiary mb-2 px-1">
+        {label}
+      </div>
+      <div className="rounded-2xl bg-bg-elevated border border-separator/60 p-5 shadow-card">
+        {children}
+      </div>
     </div>
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-center justify-between gap-4">
       <span className="text-body text-text-secondary">{label}</span>
@@ -220,29 +237,74 @@ function NumberStepper({
   max: number;
 }) {
   return (
-    <div className="flex items-center gap-1 bg-bg-secondary rounded-btn border border-separator p-0.5">
-      <button
+    <div className="flex items-center gap-1 bg-bg-secondary rounded-full border border-separator/70 p-0.5">
+      <motion.button
+        whileTap={tap}
+        transition={spring.snappy}
         onClick={() => onChange(Math.max(min, value - 1))}
-        className="w-8 h-8 rounded-[10px] hover:bg-bg-elevated"
+        className="w-8 h-8 rounded-full hover:bg-bg-elevated focus-ring cursor-pointer transition-colors"
+        aria-label="Decrement"
       >
-        –
-      </button>
-      <span className="w-8 text-center text-body tabular-nums">{value}</span>
-      <button
+        −
+      </motion.button>
+      <span className="w-8 text-center text-body tabular-nums font-medium">
+        {value}
+      </span>
+      <motion.button
+        whileTap={tap}
+        transition={spring.snappy}
         onClick={() => onChange(Math.min(max, value + 1))}
-        className="w-8 h-8 rounded-[10px] hover:bg-bg-elevated"
+        className="w-8 h-8 rounded-full hover:bg-bg-elevated focus-ring cursor-pointer transition-colors"
+        aria-label="Increment"
       >
         +
-      </button>
+      </motion.button>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  pastel,
+}: {
+  label: string;
+  value: string;
+  pastel: string;
+}) {
   return (
-    <div className="rounded-card bg-bg-secondary border border-separator p-3">
-      <div className="text-title">{value}</div>
-      <div className="text-caption text-text-secondary">{label}</div>
+    <div
+      className="rounded-xl p-3 text-left"
+      style={{ background: pastel }}
+    >
+      <div className="text-title" style={{ color: "var(--event-ink)" }}>
+        {value}
+      </div>
+      <div
+        className="text-caption mt-0.5"
+        style={{ color: "var(--event-ink-soft)" }}
+      >
+        {label}
+      </div>
     </div>
+  );
+}
+
+function ExportButton({
+  onClick,
+  children,
+}: {
+  onClick: () => void | Promise<void>;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.button
+      whileTap={tap}
+      transition={spring.snappy}
+      onClick={() => void onClick()}
+      className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full bg-bg-secondary hover:bg-bg-primary border border-separator/70 text-body text-text-primary focus-ring cursor-pointer transition-colors"
+    >
+      {children}
+    </motion.button>
   );
 }

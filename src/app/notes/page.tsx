@@ -49,16 +49,17 @@ function NotesInner() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -12 }}
             transition={spring.gentle}
-            className="w-full md:w-[300px] shrink-0 border-r border-separator bg-bg-secondary/40 flex flex-col"
+            className="w-full md:w-[300px] shrink-0 border-r border-separator/60 flex flex-col"
+            style={{ background: "var(--bg-sidebar-soft)" }}
           >
-            <div className="px-4 pt-4 pb-2">
+            <div className="px-5 pt-5 pb-2">
               <div className="relative">
-                <Search className="w-4 h-4 text-text-tertiary absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-text-tertiary absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search notes"
-                  className="w-full bg-bg-elevated border border-separator rounded-btn pl-9 pr-3 h-9 text-body focus-ring"
+                  className="w-full bg-bg-elevated border border-separator/70 rounded-xl pl-10 pr-3 h-10 text-body focus-ring"
                 />
               </div>
             </div>

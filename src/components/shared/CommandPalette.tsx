@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Calendar,
   FileText,
-  Home,
   Moon,
   Plus,
   Search,
@@ -20,6 +19,7 @@ import { useTasks } from "@/stores/tasks";
 import { useNotes } from "@/stores/notes";
 import { usePomodoro } from "@/stores/pomodoro";
 import { spring } from "@/lib/motion";
+import { cn } from "@/lib/cn";
 
 type Item = {
   id: string;
@@ -82,14 +82,6 @@ export function CommandPalette() {
           router.push("/notes?id=" + n.id);
         },
         group: "Create",
-      },
-      {
-        id: "nav-today",
-        label: "Go to Today",
-        hint: "G T",
-        icon: <Home className="w-4 h-4" />,
-        run: () => router.push("/"),
-        group: "Navigate",
       },
       {
         id: "nav-cal",
@@ -240,7 +232,7 @@ export function CommandPalette() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: -8 }}
             transition={spring.gentle}
-            className="relative w-full max-w-xl glass rounded-modal shadow-card overflow-hidden border border-separator"
+            className="relative w-full max-w-xl glass rounded-2xl shadow-2xl overflow-hidden border border-separator/60"
           >
             <div className="flex items-center gap-2 px-4 h-12 border-b border-separator">
               <Search className="w-4 h-4 text-text-tertiary" />
@@ -285,15 +277,18 @@ export function CommandPalette() {
                         key={it.id}
                         onMouseEnter={() => setIdx(myIdx)}
                         onClick={() => runItem(it)}
-                        className={
-                          "w-full flex items-center gap-3 px-4 h-10 text-body text-left " +
-                          (current ? "bg-accent text-white" : "hover:bg-bg-secondary")
+                        className={cn(
+                          "w-full flex items-center gap-3 px-4 h-10 text-body text-left transition-colors cursor-pointer",
+                          current ? "text-accent" : "hover:bg-bg-secondary"
+                        )}
+                        style={
+                          current ? { background: "var(--event-5)" } : undefined
                         }
                       >
-                        <span className={current ? "text-white" : "text-text-secondary"}>{it.icon}</span>
+                        <span className={current ? "text-accent" : "text-text-secondary"}>{it.icon}</span>
                         <span className="flex-1 truncate">{it.label}</span>
                         {it.hint && (
-                          <span className={"text-caption " + (current ? "text-white/80" : "text-text-tertiary")}>
+                          <span className={"text-caption " + (current ? "text-accent/80" : "text-text-tertiary")}>
                             {it.hint}
                           </span>
                         )}

@@ -99,8 +99,7 @@ export function useKeyboardShortcuts() {
       }
       if (Date.now() - gChord.current < 1200) {
         const k = e.key.toLowerCase();
-        if (k === "t") router.push("/");
-        else if (k === "c") router.push("/calendar");
+        if (k === "c") router.push("/calendar");
         else if (k === "n") router.push("/notes");
         else if (k === "f") router.push("/focus");
         gChord.current = 0;

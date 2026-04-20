@@ -2,12 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Calendar, FileText, Home, Timer } from "lucide-react";
+import { Calendar, FileText, Timer } from "lucide-react";
 import { spring } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 const items = [
-  { href: "/", label: "Today", icon: Home },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/notes", label: "Notes", icon: FileText },
   { href: "/focus", label: "Focus", icon: Timer },

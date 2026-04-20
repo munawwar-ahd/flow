@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           (isMobile ? "pb-[88px]" : "")
         }
         style={{
-          paddingLeft: isMobile ? 0 : sidebarCollapsed ? 64 : 220,
+          paddingLeft: isMobile ? 0 : sidebarCollapsed ? 72 : 240,
         }}
       >
         <motion.div

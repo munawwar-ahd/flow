@@ -106,7 +106,7 @@ export function GlobalSearch() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: -8 }}
           transition={spring.gentle}
-          className="relative w-full max-w-xl glass rounded-modal shadow-card overflow-hidden border border-separator"
+          className="relative w-full max-w-xl glass rounded-2xl shadow-2xl overflow-hidden border border-separator/60"
         >
           <div className="flex items-center gap-2 px-4 h-12 border-b border-separator">
             <Search className="w-4 h-4 text-text-tertiary" />
@@ -145,15 +145,16 @@ export function GlobalSearch() {
                   onMouseEnter={() => setIdx(i)}
                   onClick={h.onSelect}
                   className={
-                    "w-full flex items-start gap-3 px-4 py-2.5 text-left " +
-                    (active ? "bg-accent text-white" : "hover:bg-bg-secondary")
+                    "w-full flex items-start gap-3 px-4 py-2.5 text-left transition-colors cursor-pointer " +
+                    (active ? "text-accent" : "hover:bg-bg-secondary")
                   }
+                  style={active ? { background: "var(--event-5)" } : undefined}
                 >
-                  <Icon className={"w-4 h-4 mt-0.5 " + (active ? "text-white" : "text-text-secondary")} />
+                  <Icon className={"w-4 h-4 mt-0.5 " + (active ? "text-accent" : "text-text-secondary")} />
                   <div className="flex-1 min-w-0">
                     <div className="text-body truncate">{h.title}</div>
                     {h.subtitle && (
-                      <div className={"text-caption truncate " + (active ? "text-white/80" : "text-text-tertiary")}>
+                      <div className={"text-caption truncate " + (active ? "text-accent/80" : "text-text-tertiary")}>
                         {h.subtitle}
                       </div>
                     )}

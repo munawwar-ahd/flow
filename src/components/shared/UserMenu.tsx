@@ -130,7 +130,7 @@ export function UserMenu({ variant, collapsed, className }: Props) {
             exit={{ opacity: 0, y: variant === "sidebar" ? 4 : 6, scale: 0.98 }}
             transition={spring.gentle}
             className={cn(
-              "absolute z-50 glass rounded-card shadow-card border border-separator overflow-hidden",
+              "absolute z-50 glass rounded-2xl shadow-card border border-separator/60 overflow-hidden",
               variant === "sidebar"
                 ? "left-0 right-0 bottom-full mb-2 min-w-[200px]"
                 : "right-0 top-full mt-2 w-64"
