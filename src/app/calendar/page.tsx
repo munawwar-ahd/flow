@@ -27,6 +27,7 @@ import { EventModal } from "@/components/calendar/EventModal";
 import { SegmentedControl } from "@/components/shared/SegmentedControl";
 import { UserMenu } from "@/components/shared/UserMenu";
 import { SyncIndicator } from "@/components/shared/SyncIndicator";
+import { HomeLink } from "@/components/shared/HomeLink";
 import { useEvents } from "@/stores/events";
 import { useUI } from "@/stores/ui";
 import { useTasks } from "@/stores/tasks";
@@ -227,6 +228,7 @@ export default function CalendarPage() {
 
               <SyncIndicator variant="compact" className="md:hidden" />
               <UserMenu variant="compact" className="md:hidden" />
+              <HomeLink />
             </div>
           </div>
         </header>

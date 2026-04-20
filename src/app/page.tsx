@@ -1,42 +1,60 @@
-"use client";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { spring } from "@/lib/motion";
+import type { Metadata } from "next";
+import { LandingNav } from "@/components/landing/Nav";
+import { Hero } from "@/components/landing/Hero";
+import { FeatureSection } from "@/components/landing/FeatureSection";
+import { FinalCTA } from "@/components/landing/FinalCTA";
+import { LandingFooter } from "@/components/landing/Footer";
+import { TimelineVisual, FocusVisual, SyncVisual } from "@/components/landing/Visuals";
+
+export const metadata: Metadata = {
+  title: "Flow — Your time, beautifully organized.",
+  description: "Calm, all-in-one time management. Calendar, notes, and focus in one app.",
+};
 
 export default function LandingPage() {
-  const stagger = (i: number) => ({
-    initial: { opacity: 0, y: 8 },
-    animate: { opacity: 1, y: 0 },
-    transition: { ...spring.gentle, delay: 0.05 * i },
-  });
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-primary px-6 pt-safe pb-safe">
-      <div className="w-full max-w-md text-center">
-        <motion.h1
-          {...stagger(1)}
-          className="text-display text-text-primary"
-          style={{ letterSpacing: "-0.5px" }}
-        >
-          Flow
-        </motion.h1>
-        <motion.p
-          {...stagger(2)}
-          className="text-body text-text-secondary mt-2"
-        >
-          Landing coming soon.
-        </motion.p>
-        <motion.div {...stagger(3)} className="mt-8">
-          <Link
-            href="/calendar"
-            className="inline-flex items-center gap-1.5 text-caption font-semibold text-accent hover:brightness-110 focus-ring rounded-md px-2 py-1"
-          >
-            Go to your calendar
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </motion.div>
-      </div>
+    <>
+      {/* Preload the very first frame so it paints before JS runs */}
+      <link rel="preload" as="image" href="/frames/frame_01.jpg" />
+      <main className="relative bg-bg-primary">
+        <LandingNav />
+        <Hero />
+
+        <div id="features" className="relative">
+          <FeatureSection
+            label="TIMELINE"
+            heading="Everything on one timeline."
+            body="See your day unfold. Drag to reschedule. Tap to focus. Your time, in view."
+            visual={<TimelineVisual />}
+          />
+          <Divider />
+          <FeatureSection
+            label="FOCUS"
+            heading="Deep work, protected."
+            body="Start a session. The world fades. Only what matters remains."
+            visual={<FocusVisual />}
+            reverse
+          />
+          <Divider />
+          <FeatureSection
+            label="SYNCED"
+            heading="Wherever you are."
+            body="Write on your laptop. See it on your phone. Instantly."
+            visual={<SyncVisual />}
+          />
+        </div>
+
+        <FinalCTA />
+        <LandingFooter />
+      </main>
+    </>
+  );
+}
+
+function Divider() {
+  return (
+    <div className="flex justify-center py-4" aria-hidden>
+      <div className="h-px w-32" style={{ background: "var(--separator)", opacity: 0.4 }} />
     </div>
   );
 }

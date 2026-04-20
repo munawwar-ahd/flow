@@ -7,6 +7,7 @@ import { cn } from "@/lib/cn";
 import { spring, tap } from "@/lib/motion";
 import { UserMenu } from "@/components/shared/UserMenu";
 import { SyncIndicator } from "@/components/shared/SyncIndicator";
+import { HomeLink } from "@/components/shared/HomeLink";
 
 export function NoteList({
   activeId,
@@ -44,6 +45,7 @@ export function NoteList({
           </motion.button>
           <SyncIndicator variant="compact" className="md:hidden" />
           <UserMenu variant="compact" className="md:hidden" />
+          <HomeLink />
         </div>
       </div>
       <div className="flex-1 overflow-y-auto flow-scroll px-3 pb-6 space-y-2">

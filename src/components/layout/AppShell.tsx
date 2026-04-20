@@ -147,6 +147,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const onboarded = settings.onboarded;
   const isWidget = pathname?.startsWith("/widget");
   const isAuthRoute = pathname === "/login" || pathname?.startsWith("/auth/");
+  const isLanding = pathname === "/";
 
   useEffect(() => {
     try {
@@ -154,7 +155,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [settings.theme]);
 
-  if (isWidget || isAuthRoute) {
+  if (isWidget || isAuthRoute || isLanding) {
     return <>{children}</>;
   }
 
