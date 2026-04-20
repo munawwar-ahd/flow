@@ -5,6 +5,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { useAuthStore } from "@/stores/auth";
 import { spring, tap } from "@/lib/motion";
 import { cn } from "@/lib/cn";
+import { ScrollIndicator } from "./ScrollIndicator";
 
 const FRAME_COUNT = 30;
 const FRAME_EXT = "jpg";
@@ -181,6 +182,7 @@ export function Hero() {
         )}
 
         <TextLayer scrollYProgress={scrollYProgress} reduced={!!reduced} />
+        <ScrollIndicator />
       </div>
     </div>
   );
